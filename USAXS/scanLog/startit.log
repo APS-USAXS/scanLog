@@ -1,0 +1,96 @@
+This system is Fedora Core 6
+Sat Feb 21 10:51:28 2009 PID=22897 starting on HOST=usaxscontrol.xor.aps.anl.gov by user=s32usaxs
+CA.Client.Exception...............................................
+    Warning: "Virtual circuit unresponsive"
+    Context: "ioclax.xor.aps.anl.gov:5064"
+    Source File: ../tcpiiu.cpp line 921
+    Current Time: Sat Feb 21 2009 23:57:09.427773493
+..................................................................
+Unexpected problem with CA circuit to server "ioclax.xor.aps.anl.gov:5064" was "Connection reset by peer" - disconnecting
+CA.Client.Exception...............................................
+    Warning: "Virtual circuit disconnect"
+    Context: "ioclax.xor.aps.anl.gov:5064"
+    Source File: ../cac.cpp line 1126
+    Current Time: Sat Feb 21 2009 23:58:47.396077830
+..................................................................
+CA.Client.Exception...............................................
+    Warning: "Virtual circuit unresponsive"
+    Context: "ioclax.xor.aps.anl.gov:5064"
+    Source File: ../tcpiiu.cpp line 921
+    Current Time: Tue Feb 24 2009 13:52:15.073115086
+..................................................................
+Unexpected problem with CA circuit to server "ioclax.xor.aps.anl.gov:5064" was "Connection reset by peer" - disconnecting
+CA.Client.Exception...............................................
+    Warning: "Virtual circuit disconnect"
+    Context: "ioclax.xor.aps.anl.gov:5064"
+    Source File: ../cac.cpp line 1126
+    Current Time: Tue Feb 24 2009 13:53:51.941026277
+..................................................................
+This system is Fedora Core 6
+Fri Mar 20 09:53:04 2009 PID=931 starting on HOST=usaxscontrol.xor.aps.anl.gov by user=s32usaxs
+This system is Fedora Core 6
+Fri Mar 20 09:59:49 2009 PID=1142 starting on HOST=usaxscontrol.xor.aps.anl.gov by user=s32usaxs
+Traceback (most recent call last):
+  File "pvSupport.py", line 114, in ?
+    lastValue = update(lastValue)
+  File "pvSupport.py", line 80, in update
+    scanlog.endScanEntry(cfg['scanLog'], number, datafile)
+  File "/home/beams1/S32USAXS/jemian/scanLog/scanlog.py", line 87, in endScanEntry
+    doc = openScanLogFile(scanLogFile)
+  File "/home/beams1/S32USAXS/jemian/scanLog/scanlog.py", line 103, in openScanLogFile
+    scanLog = xml.dom.minidom.parse(xmlFile)
+  File "/usr/lib/python2.4/site-packages/_xmlplus/dom/minidom.py", line 1915, in parse
+    return expatbuilder.parse(file)
+  File "/usr/lib/python2.4/site-packages/_xmlplus/dom/expatbuilder.py", line 926, in parse
+    result = builder.parseFile(fp)
+  File "/usr/lib/python2.4/site-packages/_xmlplus/dom/expatbuilder.py", line 211, in parseFile
+    parser.Parse("", True)
+xml.parsers.expat.ExpatError: no element found: line 1, column 0
+epicsThreadOnceOsd epicsMutexLock failed.
+CA.Client.Exception...............................................
+    Warning: "Virtual circuit unresponsive"
+    Context: "ioclax.xor.aps.anl.gov:5064"
+    Source File: ../tcpiiu.cpp line 921
+    Current Time: Thu Apr 23 2009 11:14:21.894719353
+..................................................................
+This system is Fedora Core 6
+Tue Jun  9 12:26:04 2009 PID=4478 starting on HOST=usaxscontrol.xor.aps.anl.gov by user=s32usaxs
+Terminated
+This system is Fedora Core 6
+  File "pvSupport.py", line 116
+    except as error_message:
+                          ^
+SyntaxError: invalid syntax
+This system is Fedora Core 6
+  File "pvSupport.py", line 116
+    except StandardError as error_message:
+                          ^
+SyntaxError: invalid syntax
+This system is Fedora Core 6
+Tue Jun  9 13:10:29 2009 PID=5287 starting on HOST=usaxscontrol.xor.aps.anl.gov by user=s32usaxs
+Terminated
+This system is Fedora Core 6
+Tue Jun  9 13:11:24 2009 PID=5349 starting on HOST=usaxscontrol.xor.aps.anl.gov by user=s32usaxs
+Terminated
+This system is Fedora Core 6
+Tue Jun  9 13:53:34 2009 PID=5971 starting on HOST=usaxscontrol.xor.aps.anl.gov by user=s32usaxs
+Terminated
+This system is Fedora Core 6
+Tue Jun  9 13:54:16 2009 PID=6035 starting on HOST=usaxscontrol.xor.aps.anl.gov by user=s32usaxs
+#------------------------------
+#  Tue Jun  9 13:54:16 2009  Started
+#------------------------------
+CA.Client.Exception...............................................
+    Warning: "Virtual circuit unresponsive"
+    Context: "ioclax.xor.aps.anl.gov:5064"
+    Source File: ../tcpiiu.cpp line 921
+    Current Time: Tue Jun 09 2009 14:56:27.129903549
+..................................................................
+Unexpected problem with CA circuit to server "ioclax.xor.aps.anl.gov:5064" was "Connection reset by peer" - disconnecting
+CA.Client.Exception...............................................
+    Warning: "Virtual circuit disconnect"
+    Context: "ioclax.xor.aps.anl.gov:5064"
+    Source File: ../cac.cpp line 1126
+    Current Time: Tue Jun 09 2009 14:59:47.469873710
+..................................................................
+Terminated
