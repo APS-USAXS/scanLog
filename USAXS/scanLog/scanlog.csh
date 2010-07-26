@@ -21,11 +21,13 @@ setenv PYTHON  /APSshare/bin/python
 # standard sysAdmin-supplied Python has it.
 setenv PYTHON  python
 
-setenv BASE_DIR /home/beams/S32USAXS/jemian/scanLog
+setenv HOME_DIR /home/beams/S15USAXS
+setenv BASE_DIR ${HOME_DIR}/Documents/eclipse/USAXS/scanLog
+setenv WWW_DIR  /data/www/livedata
 setenv THIS_FILE ${BASE_DIR}/scanlog.csh
 setenv SCRIPT  ${BASE_DIR}/pvSupport.py
-setenv LOGFILE ${BASE_DIR}/scanlog.log
-setenv PIDFILE ${BASE_DIR}/scanlog.pid
+setenv LOGFILE ${WWW_DIR}/scanlog.log
+setenv PIDFILE ${WWW_DIR}/scanlog.pid
 
 switch ($1)
   case "start":
