@@ -12,26 +12,22 @@
 ########### SVN repository information ###################
 '''
 
-import sys
-import libxml2
 import os.path
+import sys
+from xml.dom import minidom
+from xml.etree import ElementTree
 
 #**************************************************************************
 
 def readPvlistXML(xmlFile):
-    doc = libxml2.parseFile(xmlFile)
-    context = doc.xpathNewContext()
+    doc = ElementTree.parse(xmlFile)
     db = []
-    for element in context.xpathEval('//PV_LIST/EPICS_PV'):
-    	result = element.xpathEval('./@pv')
-    	pv = result[0].content.strip()
+    for element in doc.findall('EPICS_PV'):
     	arr = {}
-    	arr['desc'] = element.content.strip()
-	for attribute in element.xpathEval('@*'):
-	    arr[attribute.name] = attribute.content.strip()
-    	db.append(arr)
-    context.xpathFreeContext()
-    doc.freeDoc()
+    	arr['desc'] = element.text.strip()
+        for attribute in element.attrib.keys():
+            arr[attribute] = element.attrib[attribute].strip()
+        db.append(arr)
     return(db)
 
 #**************************************************************************
@@ -59,6 +55,8 @@ if __name__ == "__main__":
    else:
    	   pwd = '.'
    config = readConfigurationXML(pwd)
-   print "list OF PVs named in configuration:"
-   for pv in config['pvList']:
-       print pv['pv']
+   print "PVs named in configuration:"
+   import pprint
+   pprint.pprint(config)
+   #for pv in config['pvList']:
+   #    print pv['pv']
