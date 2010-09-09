@@ -17,9 +17,11 @@ Record starting and ending times of USAXS scans
 import sys
 import time
 # TODO refactor XML support using ElementTree
+from xml.etree import ElementTree
+# SEE https://subversion.xor.aps.anl.gov/trac/bcdaext/browser/pvrrd/xmlSupport.py
 import xml.dom.minidom
-import xml.dom.ext
-import xml.xpath
+#import xml.dom.ext
+#import xml.xpath
 
 #**************************************************************************
 
@@ -27,12 +29,14 @@ def usage():
    print 'usage:  scanlog.py started|ended number fileName "the title"'
 
 def appendTextNode(doc, scanEntry, tag, value):
+    # TODO refactor using ElementTree
     elem = doc.createElement(tag)
     scanEntry.appendChild(elem)
     node = doc.createTextNode(value)
     elem.appendChild(node)
 
 def appendDateTimeNode(doc, scanEntry, tag):
+    # TODO refactor using ElementTree
     elem = doc.createElement(tag)
     scanEntry.appendChild(elem)
     elem.setAttribute('date', xmlDate())
@@ -61,10 +65,12 @@ def startScanEntry(scanLogFile, number, fileName, title):
         print "ERROR: One or more scans matches in the log file."
 	return
     # put this scan at the end of the list
+    # TODO refactor using ElementTree
     scanEntry = doc.createElement('scan')
     lastScanEntry = doc.childNodes[len(doc.childNodes)-1]
     lastScanEntry.appendChild(scanEntry)
     #---
+    # TODO refactor using ElementTree
     scanEntry.setAttribute('number', number)
     scanEntry.setAttribute('state', 'scanning')
     scanEntry.setAttribute('id', scanID)
@@ -75,6 +81,7 @@ def startScanEntry(scanLogFile, number, fileName, title):
     appendDateTimeNode(doc, scanEntry, 'started')
     #---
     # now look for any other scans with @state='scanning' and change state to 'unknown'
+    # TODO refactor using ElementTree
     for e in xml.xpath.Evaluate('//scan[@state="scanning"]', doc):
         if (e.getAttribute('id') != scanID):    # don't change the new node
 	    e.setAttribute('state', 'unknown')  # but THIS node is not scanning anymore
@@ -94,6 +101,7 @@ def endScanEntry(scanLogFile, number, fileName):
         print "ERROR: More than one scan matches in the log file! (Should not happen)"
 	return
     scanEntry = result[0]
+    # TODO refactor using ElementTree
     if (scanEntry.getAttribute('state')=='scanning'):
         scanEntry.setAttribute('state', 'complete')   # set scan/@state="complete"
         appendDateTimeNode(doc, scanEntry, 'ended')
@@ -101,11 +109,13 @@ def endScanEntry(scanLogFile, number, fileName):
     return
 
 def openScanLogFile(xmlFile):
+    # TODO refactor using ElementTree
     scanLog = xml.dom.minidom.parse(xmlFile)
     return scanLog
 
 def writeScanLogFile(xmlFile, scanLog):
     f = open(xmlFile, 'w')
+    # TODO refactor using ElementTree
     xml.dom.ext.PrettyPrint(scanLog, stream=f)
     f.close()
     return
