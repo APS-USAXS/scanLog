@@ -29,7 +29,15 @@ setenv SCRIPT  ${BASE_DIR}/pvSupport.py
 setenv LOGFILE ${WWW_DIR}/scanlog.log
 setenv PIDFILE ${WWW_DIR}/scanlog.pid
 
-switch ($1)
+setenv SNAME $0
+setenv SELECTION $1
+
+/bin/echo "#${SNAME} ${SELECTION}>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"  >>& ${LOGFILE} 
+/bin/echo "# date: `date`"  >>& ${LOGFILE} 
+/bin/echo "# env: `env`"  >>& ${LOGFILE} 
+/bin/echo "#${SNAME} ${SELECTION}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"  >>& ${LOGFILE} 
+
+switch (${SELECTION})
   case "start":
         ${PYTHON} ${SCRIPT} >>& ${LOGFILE} &
         setenv PID $!
@@ -51,18 +59,18 @@ switch ($1)
         endif
         breaksw
   case "restart":
-        $0 stop
-        $0 start
+        ${SNAME} stop
+        ${SNAME} start
         breaksw
   case "checkup":
         set pid = `/bin/cat ${PIDFILE}`
-	set test = `/bin/ps -p ${pid} --no-header -o pid`
-	if (${pid} != ${test}) then
-	  echo "# `/bin/date` could not identify running process ${pid}, restarting" >>& ${LOGFILE}
-	  echo `${THIS_FILE} restart` >& /dev/null
-	endif
+        set test = `/bin/ps -p ${pid} --no-header -o pid`
+        if (${pid} != ${test}) then
+        	echo "# `/bin/date` could not identify running process ${pid}, restarting" >>& ${LOGFILE}
+        	echo `${THIS_FILE} restart` >& /dev/null
+        endif
         breaksw
   default:
-        /bin/echo "Usage: $0 {start|stop|restart|checkup}"
+        /bin/echo "Usage: ${SNAME} {start|stop|restart|checkup}"
         breaksw
 endsw
