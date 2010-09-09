@@ -16,6 +16,7 @@ Record starting and ending times of USAXS scans
 
 import sys
 import time
+# TODO refactor XML support using ElementTree
 import xml.dom.minidom
 import xml.dom.ext
 import xml.xpath

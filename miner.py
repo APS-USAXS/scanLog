@@ -32,11 +32,10 @@ def dofile(filename):
         signal = line[0:2]
         if signal == "#S":
             parts = line.strip().split()
-            type = parts[2]
+            scanType = parts[2]
             scan_start_found = False
-            if (type == 'uascan') or (type == 'sbuascan'):
+            if (scanType == 'uascan') or (scanType == 'sbuascan'):
                 id = parts[1]
-                type = parts[2]
                 scan_start_found = True
         elif signal == "#D":
             if scan_start_found:
@@ -61,7 +60,7 @@ def dofile(filename):
                     enddate = time.strftime("%Y-%m-%d", timestruct)
                     endtime = time.strftime("%H:%M:%S", timestruct)
                     # all information is gathered for one scan entry
-                    entry = build_entry(type, id, title, filename,
+                    entry = build_entry(scanType, id, title, filename,
                         startdate, starttime, enddate, endtime)
                     DB[sortkey] = entry
     f.close
@@ -83,6 +82,9 @@ def build_entry(type, number, title, filename,
     <ended date='%s' time='%s'/>
   </scan>
     """
+    #
+    # TODO: This could fail if (XML) invalid characters are in the title
+    #
     id = "%s:%s" % (number, filename)
     buf = fmt % (
         type, number, id, title, filename,
@@ -111,7 +113,7 @@ def is_spec_file(filename):
 
 if __name__ == '__main__':
     # create usaxs-spec-files.txt using the command line:
-    #   locate .dat | grep /share1 | grep -v /archive > usaxs-spec-files.txt
+    #   locate .dat | grep /data | grep -v /archive | grep -v .Trash | grep -v livedata > usaxs-spec-files.txt
     filelist = 'usaxs-spec-files.txt'
     DB = {}
     f = open(filelist)
