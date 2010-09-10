@@ -22,13 +22,13 @@ import xmlSupport
 
 def usage():
     ''' in case we forget '''
-    print 'usage:  scanlog.py started|ended number fileName "the title"'
+    print 'usage:  scanlog.py started|ended number fileName "the title" specScanMacro'
 
 def buildID(number, fileName):
     ''' return the unique scan index ID based on scan number and file name '''
     return "%s:%s" % (number, fileName)
 
-def startScanEntry(scanLogFile, number, fileName, title):
+def startScanEntry(scanLogFile, number, fileName, title, macro):
     ''' Start a new scan in the XML file '''
     scanID = buildID(number, fileName)
     doc = xmlSupport.openScanLogFile(scanLogFile)
@@ -42,6 +42,7 @@ def startScanEntry(scanLogFile, number, fileName, title):
     scanEntry.set('number', number)
     scanEntry.set('state', 'scanning')
     scanEntry.set('id', scanID)
+    scanEntry.set('type', macro)
     # put this scan at the end of the list
     root.append(scanEntry)
     #---
@@ -74,16 +75,16 @@ def endScanEntry(scanLogFile, number, fileName):
 xmlFile = 'scanlog.xml'
 
 if __name__ == "__main__":
-    if len(sys.argv) != 5:
+    if len(sys.argv) != 6:
         usage()
         sys.exit()
 
-    (scriptname, mode, number, datafile, title) = sys.argv
+    (scriptname, mode, number, datafile, title, macro) = sys.argv
     
     # This main() is test code.  The standard support starts with pvSupport.py 
 
     if (mode == 'started'):
-        startScanEntry(xmlFile, number, datafile, title)
+        startScanEntry(xmlFile, number, datafile, title, macro)
     elif (mode == 'ended'):
         endScanEntry(xmlFile, number, datafile)
     else:

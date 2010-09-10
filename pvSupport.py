@@ -74,8 +74,9 @@ def update(lastScanningState):
         fileName = db[pvTag['file']+',value']
         title = db[pvTag['title']+',value']
         datafile = os.path.join(directory, fileName)
+        scanmacro = db[pvTag['scanmacro']+',value']
         if scanningState == 'ON':
-            scanlog.startScanEntry(cfg['scanLog'], number, datafile, title)
+            scanlog.startScanEntry(cfg['scanLog'], number, datafile, title, scanmacro)
         elif scanningState == 'OFF':
             scanlog.endScanEntry(cfg['scanLog'], number, datafile)
         else:
@@ -84,7 +85,8 @@ def update(lastScanningState):
 
 #-------------------------------------------------------------
 
-if __name__ == "__main__":
+def main():
+    ''' monitor the EPICS PVs for the scan and update the XML file '''
     message = "# " + time.ctime()
     message += " PID=" + repr(os.getpid())
     message += " starting on HOST=" + os.environ['HOST']
@@ -123,3 +125,8 @@ if __name__ == "__main__":
             print "#------------------------------"
         #report()
         time.sleep(1)
+
+#-------------------------------------------------------------
+
+if __name__ == "__main__":
+    main()
