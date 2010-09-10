@@ -84,6 +84,7 @@ def build_entry(type, number, title, filename,
     """
     #
     # TODO: This could fail if (XML) invalid characters are in the title
+    # FIXME Use ElementTree to properly construct the XML and avoid this trap.
     #
     id = "%s:%s" % (number, filename)
     buf = fmt % (
