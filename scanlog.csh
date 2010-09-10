@@ -16,6 +16,9 @@
 # 2008-12-12,PRJ: set the right paths for BCDA Python+EPICS support at APS
 source /APSshare/epics/startup/2007_07_31/epicsSetup.cshrc
 
+# FIXME ImportError: /APSshare/epics/extensions_2007_07_31/lib/linux-x86-fc6/camodule.so: wrong ELF clas
+
+
 setenv PYTHON  /APSshare/bin/python
 # 2009-06-09,PRJ: /APSshare/bin/python --> ImportError: No module named libxml2
 # standard sysAdmin-supplied Python has it.
