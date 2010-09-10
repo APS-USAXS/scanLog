@@ -24,12 +24,21 @@ import scanlog     # local support for configuration (PV list)
 
 #-------------------------------------------------------------
 
+
+db = {}
+pvList = []
+
+#-------------------------------------------------------------
+
+
 def setup(pvEntry):
     pv = pvEntry['pv']
     pvList.append(pv)
     db[pv + ',count'] = 0
     db[pv + ',time'] = 0
-    db[pv + ',ch'] = watchThis(pv)
+    ch = watchThis(pv)
+    db[pv + ',ch'] = ch
+    return ch
 
 def demoEpicsCallback(epics_args, user_args):
     chan = user_args[0]
@@ -66,6 +75,8 @@ def report():
         print pv, '\t', value, '\t', last_update
 
 def update(lastScanningState):
+    print pvTag['scanning']
+    print db
     scanningState = db[pvTag['scanning']+',value']
     if (scanningState != lastScanningState):
         # report()
@@ -75,9 +86,9 @@ def update(lastScanningState):
         title = db[pvTag['title']+',value']
         datafile = os.path.join(directory, fileName)
         scanmacro = db[pvTag['scanmacro']+',value']
-        if scanningState == 'ON':
+        if scanningState == 'scanning':
             scanlog.startScanEntry(cfg['scanLog'], number, datafile, title, scanmacro)
-        elif scanningState == 'OFF':
+        elif scanningState == 'no':
             scanlog.endScanEntry(cfg['scanLog'], number, datafile)
         else:
             print "this should not happen, state = ", scanningState
@@ -97,15 +108,21 @@ def main():
     db = {}
     pvList = []
     pvTag = {}
-    baseDir = '/home/beams/S15USAXS/jemian/scanLog'
+    baseDir = '/home/beams/S15USAXS/Documents/eclipse/USAXS/scanLog'
     cfg = xmlSupport.readConfigurationXML(baseDir)
     cfg['scanLog'] = os.path.join(baseDir,'scanlog.xml')
 
     for pvEntry in cfg['pvList']:
-        setup(pvEntry)
+        ch = setup(pvEntry)
         pvTag[pvEntry['tag']] = pvEntry['pv']
 
-    lastValue = db[pvTag['scanning']+',value']
+    lastScanningState = "unknown"
+    
+    # FIXME Why aren't the PVs connecting here?
+    # This code should not be needed.
+    for i in range(5):	# allow PVs to connect
+    	time.sleep(1)
+        ch.pend_event()
 
     print "#------------------------------"
     print "# ", time.ctime(), " Started"
@@ -117,7 +134,7 @@ def main():
         # all monitors will be received even if just
         # one PV's pend_event is called
         try:
-            lastValue = update(lastValue)
+            lastScanningState = update(lastScanningState)
         except StandardError, error_message:
             print "#------------------------------"
             print "# ", time.ctime(), " Python error report:"
