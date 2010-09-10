@@ -21,12 +21,15 @@ import xmlSupport
 #**************************************************************************
 
 def usage():
+    ''' in case we forget '''
     print 'usage:  scanlog.py started|ended number fileName "the title"'
 
 def buildID(number, fileName):
+    ''' return the unique scan index ID based on scan number and file name '''
     return "%s:%s" % (number, fileName)
 
 def startScanEntry(scanLogFile, number, fileName, title):
+    ''' Start a new scan in the XML file '''
     scanID = buildID(number, fileName)
     doc = xmlSupport.openScanLogFile(scanLogFile)
     scanNode = xmlSupport.locateScanID(doc, scanID)
@@ -52,8 +55,8 @@ def startScanEntry(scanLogFile, number, fileName, title):
 
 
 def endScanEntry(scanLogFile, number, fileName):
-    # find scan based on ID (above)
-    scanID = buildID(number, fileName)
+    ''' Set the ending time for the scan in the XML file '''
+    scanID = buildID(number, fileName)  # index using scanID (above)
     doc = xmlSupport.openScanLogFile(scanLogFile)
     scanNode = xmlSupport.locateScanID(doc, scanID)
     if len(scanNode)==None:
@@ -79,6 +82,8 @@ if __name__ == "__main__":
     number = sys.argv[2]
     datafile = sys.argv[3]
     title = sys.argv[4]
+    
+    # FIXME How are the PV names used?  Where's the code?
 
     if (mode == 'started'):
         startScanEntry(xmlFile, number, datafile, title)
