@@ -14,5 +14,6 @@ setenv PYTHON /APSshare/bin/python
 
 setenv TARGET xmlSupport.py
 setenv TARGET pvSupport.py
+setenv TARGET main.py
 
 ${PYTHON} ${TARGET}

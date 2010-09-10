@@ -25,7 +25,7 @@ setenv HOME_DIR /home/beams/S15USAXS
 setenv BASE_DIR ${HOME_DIR}/Documents/eclipse/USAXS/scanLog
 setenv WWW_DIR  /data/www/livedata
 setenv THIS_FILE ${BASE_DIR}/scanlog.csh
-setenv SCRIPT  ${BASE_DIR}/pvSupport.py
+setenv SCRIPT  ${BASE_DIR}/main.py
 setenv LOGFILE ${WWW_DIR}/scanlog.log
 setenv PIDFILE ${WWW_DIR}/scanlog.pid
 
