@@ -76,22 +76,28 @@ def flagRunawayScansAsUnknown(doc, id):
 
 def readFileAsLines(filename):
     '''open a file and read all of it into 
-        memory as a list separated by line breaks'''
-    # FIXME needs error handling
-    f = open(filename, 'r')
-    buf = f.read()
-    f.close()
-    return buf.split("\n")
+        memory as a list separated by line breaks,
+        return None if error or cannot find file'''
+    if not os.path.exists(filename):
+        return None
+    try:
+        f = open(filename, 'r')
+        buf = f.read()
+        f.close()
+        return buf.split("\n")
+    except:
+        return None
 
 #**************************************************************************
 
 def writeLinesInFile(filename, lines):
-    '''write a list of lines to a file'''
-    # FIXME needs error handling
-    f = open(filename, 'w')
-    f.write("\n".join(lines) + "\n")
-    f.close()
-    return
+    '''write a list of lines to a file, ignore any errors'''
+    try:
+        f = open(filename, 'w')
+        f.write("\n".join(lines) + "\n")
+        f.close()
+    except:
+        pass
 
 #**************************************************************************
 
