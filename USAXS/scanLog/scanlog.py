@@ -33,7 +33,7 @@ def startScanEntry(scanLogFile, number, fileName, title):
     scanID = buildID(number, fileName)
     doc = xmlSupport.openScanLogFile(scanLogFile)
     scanNode = xmlSupport.locateScanID(doc, scanID)
-    if len(scanNode)>0:
+    if scanNode != None:
         print "ERROR: One or more scans matches in the log file."
         return
     #---

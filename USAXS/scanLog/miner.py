@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 '''
-Created on Feb 21, 2009
-
-@author: Pete
+@author: Pete Jemian
 @purpose: Read a file with a list of possible SPEC file names
           and search for USAXS scans (uascan and sbuascan).
           Note information about those found and report back in
           XML format.
+@note: This routine would be improved immensely by using standard
+          XML library support instead of writing strings in XML statements.
+          The standard library support would avert problems such as
+          invalid characters in the titles.
 '''
 
 ########### SVN repository information ###################
@@ -127,7 +129,7 @@ if __name__ == '__main__':
     KEYS.sort()
     print "<?xml version='1.0' encoding='UTF-8'?>"
     print "<?xml-stylesheet type='text/xsl' href='scanlog.xsl' ?>"
-    print "<USAXS_32ID>"
+    print "<USAXS_SCAN_LOG>"
     for item in KEYS:
         print DB[item]
-    print "</USAXS_32ID>"
+    print "</USAXS_SCAN_LOG>"
