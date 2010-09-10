@@ -78,12 +78,9 @@ if __name__ == "__main__":
         usage()
         sys.exit()
 
-    mode = sys.argv[1]
-    number = sys.argv[2]
-    datafile = sys.argv[3]
-    title = sys.argv[4]
+    (scriptname, mode, number, datafile, title) = sys.argv
     
-    # FIXME How are the PV names used?  Where's the code?
+    # FIXME How are the PV names used?  Where's that code?
 
     if (mode == 'started'):
         startScanEntry(xmlFile, number, datafile, title)
