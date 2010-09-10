@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
     (scriptname, mode, number, datafile, title) = sys.argv
     
-    # FIXME How are the PV names used?  Where's that code?
+    # This main() is test code.  The standard support starts with pvSupport.py 
 
     if (mode == 'started'):
         startScanEntry(xmlFile, number, datafile, title)

@@ -95,7 +95,7 @@ if __name__ == "__main__":
     db = {}
     pvList = []
     pvTag = {}
-    baseDir = '/home/beams/S32USAXS/jemian/scanLog'
+    baseDir = '/home/beams/S15USAXS/jemian/scanLog'
     cfg = xmlSupport.readConfigurationXML(baseDir)
     cfg['scanLog'] = os.path.join(baseDir,'scanlog.xml')
 
