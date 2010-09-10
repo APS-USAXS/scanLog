@@ -20,11 +20,17 @@
 ########### SVN repository information ###################
 
 
+import sys
 import time
+from xml.etree import ElementTree
+import xmlSupport
+
+
+ROOT_ELEMENT = "USAXS_SCAN_LOG"
 
 
 def dofile(filename):
-    '''process one SPEC data file, looking for USAXS scans'''
+    '''process one SPEC data file, looking for USAXS scans, add to DB'''
     # test it first to see if it is a SPEC data file
     next_comment_is_title = False
     scan_start_found = False
@@ -64,35 +70,26 @@ def dofile(filename):
                     # all information is gathered for one scan entry
                     entry = build_entry(scanType, id, title, filename,
                         startdate, starttime, enddate, endtime)
+                    # add this to the DB dictionary
                     DB[sortkey] = entry
     f.close
 
 
 def build_entry(type, number, title, filename,
                         startdate, starttime, enddate, endtime):
-    '''return an XML element from the supplied parameters'''
-    fmt = """
-  <scan
-      state='complete'
-      type='%s'
-      number='%s'
-      id='%s'
-    >
-    <title>%s</title>
-    <file>%s</file>
-    <started date='%s' time='%s'/>
-    <ended date='%s' time='%s'/>
-  </scan>
-    """
-    #
-    # TODO: This could fail if (XML) invalid characters are in the title
-    # FIXME Use ElementTree to properly construct the XML and avoid this trap.
-    #
-    id = "%s:%s" % (number, filename)
-    buf = fmt % (
-        type, number, id, title, filename,
-        startdate, starttime, enddate, endtime)
-    return buf.strip("\n")
+    '''return a dictionary from the supplied parameters'''
+    dict = {}
+    dict['id'] = "%s:%s" % (number, filename)
+    dict['type'] = type
+    dict['number'] = number
+    dict['title'] = title
+    dict['file'] = filename
+    dict['starteddate'] = startdate
+    dict['startedtime'] = starttime
+    dict['endeddate'] = enddate
+    dict['endedtime'] = endtime
+    dict['state'] = 'complete'
+    return dict
 
 
 def is_spec_file(filename):
@@ -113,11 +110,53 @@ def is_spec_file(filename):
     f.close()
     return test
 
+def writeXmlFile(xmlFile, DB):
+    '''write the XML file with the supplied dictionary'''
+    KEYS = DB.keys()
+    KEYS.sort()
+    #---
+    # create the XML structure in memory
+    root = ElementTree.Element(ROOT_ELEMENT)
+    node = ElementTree.Element("created.by")
+    node.text = sys.argv[0]
+    node.set("datetime", time.ctime())
+    root.append(node)
+    #---
+    KEYS = DB.keys()
+    KEYS.sort()
+    for key in KEYS:
+        dict = DB[key]
+        """
+            <scan id="29:/share1/USAXS_data/2010-03/03_24_setup.dat" number="29"
+                state="complete">
+                <title>GC Bob 12kev USAXS</title>
+                <file>/share1/USAXS_data/2010-03/03_24_setup.dat</file>
+                <started date="2010-03-24" time="10:12:02" />
+                <ended date="2010-03-24" time="10:17:31" />
+            </scan>
+        """
+        scanNode = ElementTree.Element("scan")
+        for item in ('id', 'number', 'state', 'type'):
+            scanNode.set(item, dict[item])
+        for item in ('title', 'file'):
+            subNode = ElementTree.Element(item)
+            subNode.text = dict[item]
+            scanNode.append(subNode)
+        for item in ('started', 'ended'):
+            subNode = ElementTree.Element(item)
+            for part in ('date', 'time'):
+                subNode.set(part, dict[item+part])
+            scanNode.append(subNode)
+        root.append(scanNode)
+    #---
+    # wrap it in an ElementTree instance, and save as XML
+    xmlSupport.writeXmlDocToFile(xmlFile, ElementTree.ElementTree(root))
 
 if __name__ == '__main__':
     # create usaxs-spec-files.txt using the command line:
     #   locate .dat | grep /data | grep -v /archive | grep -v .Trash | grep -v livedata > usaxs-spec-files.txt
     filelist = 'usaxs-spec-files.txt'
+    #filelist = 'short-usaxs-spec-files.txt'
     DB = {}
     f = open(filelist)
     for line in f:
@@ -125,11 +164,7 @@ if __name__ == '__main__':
         if is_spec_file(filename):
             dofile(filename)
     f.close()
-    KEYS = DB.keys()
-    KEYS.sort()
-    print "<?xml version='1.0' encoding='UTF-8'?>"
-    print "<?xml-stylesheet type='text/xsl' href='scanlog.xsl' ?>"
-    print "<USAXS_SCAN_LOG>"
-    for item in KEYS:
-        print DB[item]
-    print "</USAXS_SCAN_LOG>"
+    #---
+    writeXmlFile("test.xml", DB)
+    #---
+    print "Found %d scans" % len(DB)

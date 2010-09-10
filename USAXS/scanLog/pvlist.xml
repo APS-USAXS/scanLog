@@ -11,11 +11,9 @@
 -->
 
 <PV_LIST>
-  <EPICS_PV pv="15iddLAX:bit19.VAL" tag="scanning">USAXS scanning?<!-- 15iddLAX:USAXS:scanning --></EPICS_PV>
+  <EPICS_PV pv="15iddLAX:USAXS:scanning" tag="scanning">USAXS scanning?<!-- was 15iddLAX:bit19.VAL --></EPICS_PV>
   <EPICS_PV pv="15iddLAX:USAXS:userDir" tag="directory">SPEC data directory</EPICS_PV>
-  <!-- 
-  <EPICS_PV pv="15iddLAX:USAXS:scanmacro" tag="scanmacro">name of spec scan macro (uascan | sbuascan)</EPICS_PV>
-   -->
+  <EPICS_PV pv="15iddLAX:USAXS:scanmacro" tag="scanmacro">name of spec USAXS scan macro (uascan | sbuascan)</EPICS_PV>
   <EPICS_PV pv="15iddLAX:USAXS:specFile" tag="file">SPEC data file</EPICS_PV>
   <EPICS_PV pv="15iddLAX:USAXS:specScan" tag="number">SPEC scan number</EPICS_PV>
   <EPICS_PV pv="15iddLAX:USAXS:sampleTitle" tag="title">SPEC sample title</EPICS_PV>

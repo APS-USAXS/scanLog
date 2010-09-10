@@ -13,12 +13,11 @@
 '''
 
 import os.path
+import re
 import sys
 import time
 from xml.etree import ElementTree
-# SEE https://subversion.xor.aps.anl.gov/trac/bcdaext/browser/pvrrd/xmlSupport.py
-# for pretty XML format
-from xml.dom import minidom
+import xml.dom.minidom
 
 #**************************************************************************
 
@@ -90,26 +89,43 @@ def writeLinesInFile(filename, lines):
     '''write a list of lines to a file'''
     # FIXME needs error handling
     f = open(filename, 'w')
-    f.write("\n".join(lines))
+    f.write("\n".join(lines) + "\n")
     f.close()
     return
 
 #**************************************************************************
 
 def prettyXml(element):
-    '''indent written XML nicely'''
-    # FIXME poor introduction of whitespace - DO NOT USE YET
-    txt = ElementTree.tostring(element)
-    return minidom.parseString(txt).toprettyxml()
+    '''fallback support for better code'''
+    return prettyXmlToString(element)
+
+def prettyXmlToString(element):
+    '''make nice-looking XML that is human-readable
+    @see http://stackoverflow.com/questions/749796/pretty-printing-xml-in-python'''
+    str = ElementTree.tostring(element)
+    dom = xml.dom.minidom.parseString(str)
+    ugly = dom.toprettyxml()
+    #pretty = dom.toxml()
+    text_re = re.compile('>\n\s+([^<>\s].*?)\n\s+</', re.DOTALL)    
+    pretty = text_re.sub('>\g<1></', ugly)
+    return "\n".join(removeBlankLines(pretty.split("\n")))
 
 #**************************************************************************
 
-def writeScanLogFile(xmlFile, doc):
+def removeBlankLines(lines):
+    result = []
+    for line in lines:
+        if len(line.strip()) > 0:
+            result.append(line)
+    return result
+
+#**************************************************************************
+
+def writeXmlDocToFile(xmlFile, doc):
     '''write the XML doc to a file'''
-    doc.write(xmlFile, encoding="UTF-8")
     # splice in the reference to the XSLT at the top of the file (on line 2)
     xsltRef = '<?xml-stylesheet type="text/xsl" href="scanlog.xsl" ?>'
-    lines = readFileAsLines(xmlFile)
+    lines = prettyXmlToString(doc.getroot()).split("\n")
     lines.insert(1, xsltRef)
     writeLinesInFile(xmlFile, lines)
     return
@@ -159,10 +175,11 @@ if __name__ == "__main__":
     #pprint.pprint(config)
 
     doc = openScanLogFile('scanlog.xml')
-    scan = locateScanID(doc, '43:/share1/USAXS_data/2010-03/03_24_setup.dat')
-    print scan
     root = doc.getroot()
-    appendTextNode(doc, root, "bewilderment", "is a state of mind")
+    scan = locateScanID(doc, '43:/share1/USAXS_data/2010-03/03_24_setup.dat')
+    scan.set("gotcha", "True")
+    print prettyXmlToString(scan)
+    appendTextNode(doc, root, "modifed.by", sys.argv[0])
     appendDateTimeNode(doc, root, "timestamp")
     #print prettyXml(root)
-    writeScanLogFile('test.xml', doc)
+    writeXmlDocToFile('test.xml', doc)
