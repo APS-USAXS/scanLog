@@ -171,6 +171,7 @@ def main():
         if time.time() >= nextReport:
             nextReport = time.time() + reportInterval_seconds
             reportEpicsPvs(pvList)
+        sys.stdout.flush()
         time.sleep(1)   # Is it possible to miss a transition at 1 Hz?
 
 #-------------------------------------------------------------
