@@ -52,7 +52,7 @@ def startScanEntry(scanLogFile, number, fileName, title, macro):
     #---
     xmlSupport.flagRunawayScansAsUnknown(doc, scanID)
     #---
-    xmlSupport.writeScanLogFile(scanLogFile, doc)
+    xmlSupport.writeXmlDocToFile(scanLogFile, doc)
 
 
 def endScanEntry(scanLogFile, number, fileName):
@@ -60,14 +60,14 @@ def endScanEntry(scanLogFile, number, fileName):
     scanID = buildID(number, fileName)  # index using scanID (above)
     doc = xmlSupport.openScanLogFile(scanLogFile)
     scanNode = xmlSupport.locateScanID(doc, scanID)
-    if len(scanNode)==None:
+    if scanNode==None:
         print "ERROR: Could not find that scan in the log file."
         return
     #---
     if (scanNode.get('state')=='scanning'):
         scanNode.set('state', 'complete')   # set scan/@state="complete"
         xmlSupport.appendDateTimeNode(doc, scanNode, 'ended')
-        xmlSupport.writeScanLogFile(scanLogFile, doc)
+        xmlSupport.writeXmlDocToFile(scanLogFile, doc)
 
 
 #-------------------------------------------------
