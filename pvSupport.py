@@ -77,15 +77,18 @@ def reportEpicsPvs(pvList):
     '''print all the PV values to stdout'''
     global db
     dict = {}
+    format = "%20s\t%10s\t%36s\t%s"
     for pv in pvList:
         value = db[pv+',value']
         last_update = db[pv+',time']
+        count = db[pv+',count']
         timeStr = timeToStr(last_update)
-        dict[timeStr + pv] = "%s\t%36s\t%s" % (timeStr, pv, value)
+        dict[timeStr + pv] = format % (timeStr, count, pv, value)
     keys = dict.keys()
     keys.sort()
     now = timeToStr(time.time())
     print "# reportEpicsPvs(): " + now
+    print "#"+format % ("time stamp", "# received", "PV name", "value")
     for key in keys:
         print dict[key]
 
