@@ -20,6 +20,10 @@ import xmlSupport
 
 #**************************************************************************
 
+MACROS_ALLOWED_TO_LOG = ('uascan', 'sbuascan')
+
+#**************************************************************************
+
 def usage():
     ''' in case we forget '''
     print 'usage:  scanlog.py started|ended number fileName "the title" specScanMacro'
@@ -30,6 +34,8 @@ def buildID(number, fileName):
 
 def startScanEntry(scanLogFile, number, fileName, title, macro):
     ''' Start a new scan in the XML file '''
+    if not macro in MACROS_ALLOWED_TO_LOG:
+        return  # ignore this one
     scanID = buildID(number, fileName)
     doc = xmlSupport.openScanLogFile(scanLogFile)
     scanNode = xmlSupport.locateScanID(doc, scanID)
@@ -61,7 +67,7 @@ def endScanEntry(scanLogFile, number, fileName):
     doc = xmlSupport.openScanLogFile(scanLogFile)
     scanNode = xmlSupport.locateScanID(doc, scanID)
     if scanNode==None:
-        print "ERROR: Could not find that scan in the log file."
+        #print "ERROR: Could not find that scan in the log file."
         return
     #---
     if (scanNode.get('state')=='scanning'):
