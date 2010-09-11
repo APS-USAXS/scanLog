@@ -29,8 +29,7 @@ setenv SELECTION $1
 
 /bin/echo "#${SNAME} ${SELECTION}>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"  >>& ${LOGFILE} 
 /bin/echo "# date: `date`"  >>& ${LOGFILE} 
-/bin/echo "# env: `env|sort`"  >>& ${LOGFILE} 
-/bin/echo "#${SNAME} ${SELECTION}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"  >>& ${LOGFILE} 
+#/bin/echo "# env: `env|sort`"  >>& ${LOGFILE} 
 
 switch (${SELECTION})
   case "start":
@@ -69,3 +68,5 @@ switch (${SELECTION})
         /bin/echo "Usage: ${SNAME} {start|stop|restart|checkup}"
         breaksw
 endsw
+
+/bin/echo "#${SNAME} ${SELECTION}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"  >>& ${LOGFILE} 
