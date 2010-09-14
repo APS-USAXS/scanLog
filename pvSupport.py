@@ -129,6 +129,9 @@ def errorReport(message):
 
 #-------------------------------------------------------------
 
+SCANLOG_XML = 'scanlog.xml'
+PVLIST_XML = 'pvlist.xml'
+
 def main():
     ''' monitor the EPICS PVs for the scan and update the XML file '''
     global cfg
@@ -146,8 +149,8 @@ def main():
     pvList = []
     pvTag = {}
     baseDir = '/home/beams/S15USAXS/Documents/eclipse/USAXS/scanLog'
-    cfg = xmlSupport.readConfigurationXML(baseDir)
-    cfg['scanLog'] = os.path.join(baseDir,'scanlog.xml')
+    cfg = xmlSupport.readConfigurationXML(os.path.join(baseDir, PVLIST_XML))
+    cfg['scanLog'] = os.path.join(baseDir, cfg['scanLogFile'])
 
     for pvEntry in cfg['pvList']:
         ch = setupEpicsConnection(pvEntry)     # remember this for the calls to ch.pend_event()

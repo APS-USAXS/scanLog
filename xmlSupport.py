@@ -24,6 +24,7 @@ import xml.dom.minidom
 def readPvlistXML(xmlFile):
     '''get the list of PVs to monitor from the XML file'''
     doc = ElementTree.parse(xmlFile)
+    dict = {}
     db = []
     for element in doc.findall('EPICS_PV'):
         arr = {}
@@ -31,16 +32,15 @@ def readPvlistXML(xmlFile):
         for attribute in element.attrib.keys():
             arr[attribute] = element.attrib[attribute].strip()
         db.append(arr)
-    return(db)
+    dict['pvList'] = db
+    dict['scanLogFile'] = doc.find('scanLog_file').text
+    return(dict)
 
 #**************************************************************************
 
-def readConfigurationXML(baseDir):
+def readConfigurationXML(pvListFile):
     '''locate the PV configuration from XML into memory'''
-    config = {}
-    pvListFile = os.path.join(baseDir, 'pvlist.xml')
-    config['pvList'] = readPvlistXML(pvListFile)
-    return(config)
+    return readPvlistXML(pvListFile)
 
 #**************************************************************************
 
@@ -175,12 +175,9 @@ if __name__ == "__main__":
         pwd = sys.argv[1]
     else:
         pwd = '.'
-    config = readConfigurationXML(pwd)
-    #print "PVs named in configuration:"
-    #import pprint
-    #pprint.pprint(config)
+    config = readConfigurationXML(os.path.join(pwd, 'pvlist.xml'))
 
-    doc = openScanLogFile('scanlog.xml')
+    doc = openScanLogFile(config['scanLogFile'])
     root = doc.getroot()
     scan = locateScanID(doc, '43:/share1/USAXS_data/2010-03/03_24_setup.dat')
     scan.set("gotcha", "True")

@@ -16,6 +16,7 @@ Record starting and ending times of USAXS scans
 
 import sys
 from xml.etree import ElementTree
+import wwwServerTransfers
 import xmlSupport
 
 #**************************************************************************
@@ -59,6 +60,9 @@ def startScanEntry(scanLogFile, number, fileName, title, macro):
     xmlSupport.flagRunawayScansAsUnknown(doc, scanID)
     #---
     xmlSupport.writeXmlDocToFile(scanLogFile, doc)
+    #---
+    wwwServerTransfers.scpToWebServer(scanLogFile, 
+                  os.path.split(scanLogFile)[-1], demo = True)
 
 
 def endScanEntry(scanLogFile, number, fileName):
@@ -74,9 +78,17 @@ def endScanEntry(scanLogFile, number, fileName):
         scanNode.set('state', 'complete')   # set scan/@state="complete"
         xmlSupport.appendDateTimeNode(doc, scanNode, 'ended')
         xmlSupport.writeXmlDocToFile(scanLogFile, doc)
+        #---
+        wwwServerTransfers.scpToWebServer(scanLogFile, 
+              os.path.split(scanLogFile)[-1], demo = True)
 
 
 #-------------------------------------------------
+
+# TODO Trac ticket #8: Can we get this from the pvlist.xml file instead?
+# It is already read out by xmlSupport
+
+# TODO Trac ticket #7: directory handling in this support is sloopppy.  Must be cleaned up.
 
 xmlFile = 'scanlog.xml'
 
