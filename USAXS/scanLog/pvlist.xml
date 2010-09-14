@@ -10,7 +10,7 @@
 ########### SVN repository information ###################
 -->
 
-<PV_LIST>
+<PV_LIST version="1.0">
   <scanLog_file>scanlog.xml</scanLog_file>
   <EPICS_PV pv="15iddLAX:USAXS:scanning" tag="scanning">USAXS scanning?<!-- was 15iddLAX:bit19.VAL --></EPICS_PV>
   <EPICS_PV pv="15iddLAX:USAXS:userDir" tag="directory">SPEC data directory</EPICS_PV>
