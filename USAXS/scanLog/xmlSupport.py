@@ -23,17 +23,19 @@ import xml.dom.minidom
 
 def readPvlistXML(xmlFile):
     '''get the list of PVs to monitor from the XML file'''
-    doc = ElementTree.parse(xmlFile)
+    doc = openScanLogFile(xmlFile)
     dict = {}
-    db = []
-    for element in doc.findall('EPICS_PV'):
-        arr = {}
-        arr['desc'] = element.text.strip()
-        for attribute in element.attrib.keys():
-            arr[attribute] = element.attrib[attribute].strip()
-        db.append(arr)
-    dict['pvList'] = db
-    dict['scanLogFile'] = doc.find('scanLog_file').text
+    if doc != None:
+        db = []
+        for element in doc.findall('EPICS_PV'):
+            arr = {}
+            arr['desc'] = element.text.strip()
+            for attribute in element.attrib.keys():
+                arr[attribute] = element.attrib[attribute].strip()
+            db.append(arr)
+        dict['pvList'] = db
+        dict['scanLogFile'] = doc.find('scanLog_file').text
+        dict['local_www_dir'] = doc.find('local_www_dir').text
     return(dict)
 
 #**************************************************************************
@@ -45,9 +47,14 @@ def readConfigurationXML(pvListFile):
 #**************************************************************************
 
 def openScanLogFile(xmlFile):
-    '''open the XML file with ElemenetTree
+    '''open the XML file with ElementTree
         return the doc (doc.getroot() to get the root node)'''
-    return ElementTree.parse(xmlFile)
+    doc = None
+    try:
+        doc = ElementTree.parse(xmlFile)
+    except:
+        pass
+    return doc
 
 #**************************************************************************
 
@@ -169,14 +176,16 @@ def xmlTime():
 
 #**************************************************************************
 
-
-if __name__ == "__main__":
+def main():
+    ''' test routine '''
     if (len(sys.argv) == 2):
         pwd = sys.argv[1]
     else:
         pwd = '.'
     config = readConfigurationXML(os.path.join(pwd, 'pvlist.xml'))
-
+    if len(config) == 0:
+        print "ERROR: could not read the configuration file"
+        return
     doc = openScanLogFile(config['scanLogFile'])
     root = doc.getroot()
     scan = locateScanID(doc, '43:/share1/USAXS_data/2010-03/03_24_setup.dat')
@@ -186,3 +195,8 @@ if __name__ == "__main__":
     appendDateTimeNode(doc, root, "timestamp")
     #print prettyXml(root)
     writeXmlDocToFile('test.xml', doc)
+
+#**************************************************************************
+
+if __name__ == "__main__":
+    main()
