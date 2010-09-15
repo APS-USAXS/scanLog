@@ -14,6 +14,7 @@ Record starting and ending times of USAXS scans
 
 #**************************************************************************
 
+import os
 import sys
 from xml.etree import ElementTree
 import wwwServerTransfers
@@ -39,6 +40,9 @@ def startScanEntry(scanLogFile, number, fileName, title, macro):
         return  # ignore this one
     scanID = buildID(number, fileName)
     doc = xmlSupport.openScanLogFile(scanLogFile)
+    if doc == None:
+        print "ERROR: Could not open file: " + scanLogFile
+        return
     scanNode = xmlSupport.locateScanID(doc, scanID)
     if scanNode != None:
         print "ERROR: One or more scans matches in the log file."
@@ -61,8 +65,9 @@ def startScanEntry(scanLogFile, number, fileName, title, macro):
     #---
     xmlSupport.writeXmlDocToFile(scanLogFile, doc)
     #---
+    # TODO set demo=False   With below, fixes Trac ticket #9
     wwwServerTransfers.scpToWebServer(scanLogFile, 
-                  os.path.split(scanLogFile)[-1], demo = True)
+                  os.path.split(scanLogFile)[-1], demo = False)
 
 
 def endScanEntry(scanLogFile, number, fileName):
@@ -79,8 +84,9 @@ def endScanEntry(scanLogFile, number, fileName):
         xmlSupport.appendDateTimeNode(doc, scanNode, 'ended')
         xmlSupport.writeXmlDocToFile(scanLogFile, doc)
         #---
+        # TODO set demo=False   With above, fixes Trac ticket #9
         wwwServerTransfers.scpToWebServer(scanLogFile, 
-              os.path.split(scanLogFile)[-1], demo = True)
+              os.path.split(scanLogFile)[-1], demo = False)
 
 
 #-------------------------------------------------

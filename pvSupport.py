@@ -87,10 +87,12 @@ def reportEpicsPvs(pvList):
     keys = dict.keys()
     keys.sort()
     now = timeToStr(time.time())
+    print "#" + ">"*60
     print "# reportEpicsPvs(): " + now
     print "#"+format % ("time stamp", "# received", "PV name", "value")
     for key in keys:
         print dict[key]
+    print "#" + "<"*60
 
 
 def updateScanLog(lastScanningState):
@@ -150,7 +152,10 @@ def main():
     pvTag = {}
     baseDir = '/home/beams/S15USAXS/Documents/eclipse/USAXS/scanLog'
     cfg = xmlSupport.readConfigurationXML(os.path.join(baseDir, PVLIST_XML))
-    cfg['scanLog'] = os.path.join(baseDir, cfg['scanLogFile'])
+    if len(cfg) == 0:
+        print "ERROR: could not read the configuration file"
+        return
+    cfg['scanLog'] = os.path.join(cfg['local_www_dir'], cfg['scanLogFile'])
 
     for pvEntry in cfg['pvList']:
         ch = setupEpicsConnection(pvEntry)     # remember this for the calls to ch.pend_event()
