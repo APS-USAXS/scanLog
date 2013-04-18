@@ -13,7 +13,7 @@
 <PV_LIST version="1.0">
   <scanLog_file>scanlog.xml</scanLog_file>
   <local_www_dir>/data/www/livedata</local_www_dir>
-  <EPICS_PV pv="15iddLAX:USAXS:scanning" tag="scanning">USAXS scanning?<!-- was 15iddLAX:bit19.VAL --></EPICS_PV>
+  <EPICS_PV pv="15iddLAX:USAXS:scanning" tag="scanning">USAXS scanning?</EPICS_PV>
   <EPICS_PV pv="15iddLAX:USAXS:userDir" tag="directory">SPEC data directory</EPICS_PV>
   <EPICS_PV pv="15iddLAX:USAXS:scanMacro" tag="scanmacro">name of spec USAXS scan macro (uascan | sbuascan)</EPICS_PV>
   <EPICS_PV pv="15iddLAX:USAXS:specFile" tag="file">SPEC data file</EPICS_PV>
