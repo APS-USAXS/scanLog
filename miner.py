@@ -28,6 +28,7 @@ import xmlSupport
 
 ROOT_ELEMENT = "USAXS_SCAN_LOG"
 
+SCAN_TYPES_LOGGED = ['uascan', 'sbuascan', 'FlyScan']
 
 def dofile(filename):
     '''process one SPEC data file, looking for USAXS scans, add to DB'''
@@ -42,7 +43,7 @@ def dofile(filename):
             parts = line.strip().split()
             scanType = parts[2]
             scan_start_found = False
-            if (scanType == 'uascan') or (scanType == 'sbuascan'):
+            if scanType in SCAN_TYPES_LOGGED:
                 id = parts[1]
                 scan_start_found = True
         elif signal == "#D":
