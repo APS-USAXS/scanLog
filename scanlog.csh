@@ -5,16 +5,8 @@
 #
 # processname: scanlog
 
-########### SVN repository information ###################
-# $Date$
-# $Author$
-# $Revision$
-# $HeadURL$
-# $Id$
-########### SVN repository information ###################
 
-
-setenv PYTHON  /APSshare/bin/python
+setenv PYTHON  /APSshare/epd/rh6-x86_64/bin/python
 
 setenv HOME_DIR /home/beams/S15USAXS
 setenv BASE_DIR ${HOME_DIR}/Documents/eclipse/USAXS/scanLog
@@ -70,3 +62,11 @@ switch (${SELECTION})
 endsw
 
 /bin/echo "#${SNAME} ${SELECTION}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"  >>& ${LOGFILE} 
+
+########### SVN repository information ###################
+# $Date$
+# $Author$
+# $Revision$
+# $HeadURL$
+# $Id$
+########### SVN repository information ###################

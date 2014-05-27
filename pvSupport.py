@@ -1,36 +1,27 @@
 #!/bin/env python
 
-'''
-log EPICS data into RRD files
-
-########### SVN repository information ###################
-# $Date$
-# $Author$
-# $Revision$
-# $HeadURL$
-# $Id$
-########### SVN repository information ###################
-'''
+'''watch EPICS PVs for user scan events and log to XML file'''
 
 #-------------------------------------------------------------
 
-import ca
-import CaChannel
-import time
 import os
 import sys
-import xmlSupport  # local support for the log file of USAXS scans
-import scanlog     # local support for configuration (PV list)
+import time
+import epics        # PyEpics
+import xmlSupport   # local support for the log file of USAXS scans
+import scanlog      # local support for configuration (PV list)
 
 
 #-------------------------------------------------------------
 
 
 def setupEpicsConnection(pvEntry):
-    '''prepare the data structures to monitor 
-    this EPICS PV and initiate the monitor
-    @param pvEntry: EPICS PV name string
-    @return: EPICS PV channel object'''
+    '''
+    prepare data structures to monitor this EPICS PV and initiate the monitor
+    
+    :param str pvEntry: EPICS PV name string
+    :return obj: instance of epics.PV(): EPICS PV channel object
+    '''
     global db
     pv = pvEntry['pv']
     db[pv + ',count'] = 0
@@ -40,32 +31,26 @@ def setupEpicsConnection(pvEntry):
     return ch
 
 
-def doEpicsPvMonitorEvent(epics_args, user_args):
+def doEpicsPvConnectEvent(**kw):
+    '''responds to an EPICS connect event on a process variable (PV)'''
+    conn = kw['conn']
+    # otherwise, do nothing
+
+
+def doEpicsPvMonitorEvent(pvname=None, char_value=None, **kw):
     '''responds to an EPICS monitor on a process variable (PV)'''
     global db
-    chan = user_args[0]
-    pv = chan.name()
-    value = epics_args["pv_value"]
-    db[pv + ',value'] = value
-    db[pv + ',count'] += 1  # number of times this PV updated
-    db[pv + ',time'] = time.time()  # Python time monitor was received
+    db[pvname + ',value'] = char_value
+    db[pvname + ',count'] += 1  # number of times this PV updated
+    db[pvname + ',time'] = time.time()  # Python time monitor was received
 
 
 def connectPvAndMonitor(pv):
     '''connect with EPICS PV and initiate monitor'''
-    ch = CaChannel.CaChannel()
-    try:
-        ch.searchw(pv)
-        user_args = (ch)
-        ch.add_masked_array_event(ca.DBR_STRING, 
-              1, ca.DBE_VALUE, doEpicsPvMonitorEvent, user_args)
-    except:
-        message = time.ctime()
-        message += " could not find " + pv
-        print message
-        sys.stdout.flush()
-        ch = ''
-    return (ch)
+    ch = epics.PV(pv, 
+                  connection_callback=doEpicsPvConnectEvent, 
+                  callback=doEpicsPvMonitorEvent)
+    return ch
 
 def timeToStr(time_seconds):
     '''format the time as ISO8601 human-readable string'''
@@ -76,22 +61,22 @@ def timeToStr(time_seconds):
 def reportEpicsPvs(pvList):
     '''print all the PV values to stdout'''
     global db
-    dict = {}
-    format = "%20s\t%10s\t%36s\t%s"
+    xref = {}
+    fmt = "%20s\t%10s\t%36s\t%s"
     for pv in pvList:
         value = db[pv+',value']
         last_update = db[pv+',time']
         count = db[pv+',count']
         timeStr = timeToStr(last_update)
-        dict[timeStr + pv] = format % (timeStr, count, pv, value)
-    keys = dict.keys()
+        xref[timeStr + pv] = fmt % (timeStr, count, pv, value)
+    keys = xref.keys()
     keys.sort()
     now = timeToStr(time.time())
     print "#" + ">"*60
     print "# reportEpicsPvs(): " + now
-    print "#"+format % ("time stamp", "# received", "PV name", "value")
+    print "#"+fmt % ("time stamp", "# received", "PV name", "value")
     for key in keys:
-        print dict[key]
+        print xref[key]
     print "#" + "<"*60
 
 
@@ -134,8 +119,9 @@ def errorReport(message):
 SCANLOG_XML = 'scanlog.xml'
 PVLIST_XML = 'pvlist.xml'
 
+
 def main():
-    ''' monitor the EPICS PVs for the scan and update the XML file '''
+    ''' monitor the EPICS PVs for the scan and update the XML file'''
     global cfg
     global db
     global pvTag
@@ -158,10 +144,10 @@ def main():
     cfg['scanLog'] = os.path.join(cfg['local_www_dir'], cfg['scanLogFile'])
 
     for pvEntry in cfg['pvList']:
-        ch = setupEpicsConnection(pvEntry)     # remember this for the calls to ch.pend_event()
+        setupEpicsConnection(pvEntry)     # remember this for the calls to ch.pend_event()
         pvList.append(pvEntry['pv'])
         pvTag[pvEntry['tag']] = pvEntry['pv']
-        ch.pend_event()
+        epics.ca.poll()
 
     lastScanningState = "initial"
     reportInterval_seconds = 30*60  # dump out the PV values to stdout
@@ -171,7 +157,7 @@ def main():
     print "# ", time.ctime(), " Started"
     print "#------------------------------"
     while 1:
-        ch.pend_event() # receives all PV monitors, not just for ch
+        epics.ca.poll() # receives all PV monitors, not just for ch
         try:
             lastScanningState = updateScanLog(lastScanningState)
         except StandardError, error_message:
@@ -186,3 +172,12 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+########### SVN repository information ###################
+# $Date$
+# $Author$
+# $Revision$
+# $HeadURL$
+# $Id$
+########### SVN repository information ###################

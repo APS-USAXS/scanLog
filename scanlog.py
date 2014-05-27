@@ -1,16 +1,6 @@
 #!/usr/bin/python
 
-'''
-Record starting and ending times of USAXS scans
-
-########### SVN repository information ###################
-# $Date$
-# $Author$
-# $Revision$
-# $HeadURL$
-# $Id$
-########### SVN repository information ###################
-'''
+'''Record starting and ending times of USAXS scans'''
 
 #**************************************************************************
 
@@ -114,3 +104,12 @@ if __name__ == "__main__":
     else:
         usage()
         sys.exit()
+
+
+########### SVN repository information ###################
+# $Date$
+# $Author$
+# $Revision$
+# $HeadURL$
+# $Id$
+########### SVN repository information ###################

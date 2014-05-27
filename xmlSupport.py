@@ -1,16 +1,6 @@
 #!/usr/bin/env python
 
-'''
- read XML configuration files into a common data structure
-
-########### SVN repository information ###################
-# $Date$
-# $Author$
-# $Revision$
-# $HeadURL$
-# $Id$
-########### SVN repository information ###################
-'''
+'''read XML configuration files into a common data structure'''
 
 import os.path
 import re
@@ -24,7 +14,7 @@ import xml.dom.minidom
 def readPvlistXML(xmlFile):
     '''get the list of PVs to monitor from the XML file'''
     doc = openScanLogFile(xmlFile)
-    dict = {}
+    xref = {}
     if doc != None:
         db = []
         for element in doc.findall('EPICS_PV'):
@@ -33,10 +23,10 @@ def readPvlistXML(xmlFile):
             for attribute in element.attrib.keys():
                 arr[attribute] = element.attrib[attribute].strip()
             db.append(arr)
-        dict['pvList'] = db
-        dict['scanLogFile'] = doc.find('scanLog_file').text
-        dict['local_www_dir'] = doc.find('local_www_dir').text
-    return(dict)
+        xref['pvList'] = db
+        xref['scanLogFile'] = doc.find('scanLog_file').text
+        xref['local_www_dir'] = doc.find('local_www_dir').text
+    return(xref)
 
 #**************************************************************************
 
@@ -58,25 +48,25 @@ def openScanLogFile(xmlFile):
 
 #**************************************************************************
 
-def locateScanID(doc, id):
+def locateScanID(doc, scanid):
     '''find the XML scan entry with matching id attribute
         return XML node or None if not found
     '''
     result = None
-    #query = "scan/[@id='%s']" % id
+    #query = "scan/[@id='%s']" % scanid
     for node in doc.findall("scan"):
-        if node.get("id") == id:
+        if node.get("id") == scanid:
             result = node
             break
     return result
 
 #**************************************************************************
 
-def flagRunawayScansAsUnknown(doc, id):
+def flagRunawayScansAsUnknown(doc, scanid):
     '''sometimes, a scan ends without this program finding out'''
     for node in doc.findall("scan"):            # look for any scan ...
         if node.get("state") == "scanning":     # with state="scanning" ...
-            if node.get("id") != id:            # but not the newest node ...
+            if node.get("id") != scanid:        # but not the newest node ...
                 node.set("state", "unknown")    # THIS node is not scanning anymore
 
 #**************************************************************************
@@ -112,11 +102,12 @@ def prettyXml(element):
     '''fallback support for better code'''
     return prettyXmlToString(element)
 
+
 def prettyXmlToString(element):
     '''make nice-looking XML that is human-readable
     @see http://stackoverflow.com/questions/749796/pretty-printing-xml-in-python'''
-    str = ElementTree.tostring(element)
-    dom = xml.dom.minidom.parseString(str)
+    txt = ElementTree.tostring(element)
+    dom = xml.dom.minidom.parseString(txt)
     ugly = dom.toprettyxml()
     #pretty = dom.toxml()
     text_re = re.compile('>\n\s+([^<>\s].*?)\n\s+</', re.DOTALL)    
@@ -164,15 +155,15 @@ def appendDateTimeNode(doc, parent, tag):
 
 def xmlDate():
     '''current date, for use in XML file (ISO8601)'''
-    str = time.strftime('%Y-%m-%d')    # XML date format
-    return str
+    txt = time.strftime('%Y-%m-%d')    # XML date format
+    return txt
 
 #**************************************************************************
 
 def xmlTime():
     '''current time, for use in XML file (ISO8601)'''
-    str = time.strftime('%H:%M:%S')    # XML time format
-    return str
+    txt = time.strftime('%H:%M:%S')    # XML time format
+    return txt
 
 #**************************************************************************
 
@@ -200,3 +191,12 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+########### SVN repository information ###################
+# $Date$
+# $Author$
+# $Revision$
+# $HeadURL$
+# $Id$
+########### SVN repository information ###################
