@@ -4,8 +4,8 @@
 
 if __name__ == "__main__":
     ''' show which module is the main code to run '''
-    import pvSupport
-    pvSupport.main()
+    import scanLog
+    scanLog.main()
 
 
 ########### SVN repository information ###################

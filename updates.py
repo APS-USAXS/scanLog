@@ -18,7 +18,7 @@ MACROS_ALLOWED_TO_LOG = ('uascan', 'sbuascan', 'FlyScan', 'pinSAXS', 'WAXS')
 
 def usage():
     ''' in case we forget '''
-    print 'usage:  scanlog.py started|ended number fileName "the title" specScanMacro'
+    print 'usage:  updates.py started|ended number fileName "the title" specScanMacro'
 
 def buildID(number, fileName):
     ''' return the unique scan index ID based on scan number and file name '''
