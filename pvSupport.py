@@ -8,7 +8,7 @@ import sys
 import time
 import epics        # PyEpics
 import xmlSupport   # local support for the log file of USAXS scans
-import scanlog      # local support for configuration (PV list)
+import updates      # local support for configuration (PV list)
 import pyRestTable  # formatted tabular output
 
 
@@ -84,10 +84,10 @@ def updateScanLog(lastScanningState):
             number = db[pvTag['number']].value
             scanmacro = db[pvTag['scanmacro']].value
             if scanningState == 'scanning':
-                scanlog.startScanEntry(
+                updates.startScanEntry(
                     cfg['scanLog'], number, datafile, title, scanmacro)
             elif scanningState == 'no':
-                scanlog.endScanEntry(
+                updates.endScanEntry(
                     cfg['scanLog'], number, datafile)
             else:
                 print "this should not happen, state = ", scanningState
