@@ -2,7 +2,6 @@
 
 '''watch EPICS PVs for user scan events and log to XML file'''
 
-#-------------------------------------------------------------
 
 import os
 import sys
@@ -10,6 +9,7 @@ import time
 import epics        # PyEpics
 import xmlSupport   # local support for the log file of USAXS scans
 import scanlog      # local support for configuration (PV list)
+import pyRestTable  # formatted tabular output
 
 
 #-------------------------------------------------------------
@@ -25,9 +25,8 @@ def setupEpicsConnection(pvEntry):
     global db
     pv = pvEntry['pv']
     db[pv + ',count'] = 0
-    db[pv + ',time'] = 0
     ch = connectPvAndMonitor(pv)
-    db[pv + ',ch'] = ch
+    db[pv] = ch
     return ch
 
 
@@ -40,9 +39,7 @@ def doEpicsPvConnectEvent(**kw):
 def doEpicsPvMonitorEvent(pvname=None, char_value=None, **kw):
     '''responds to an EPICS monitor on a process variable (PV)'''
     global db
-    db[pvname + ',value'] = char_value
-    db[pvname + ',count'] += 1  # number of times this PV updated
-    db[pvname + ',time'] = time.time()  # Python time monitor was received
+    db[pvname + ',count'] += 1  # count number of times this PV updated
 
 
 def connectPvAndMonitor(pv):
@@ -61,22 +58,14 @@ def timeToStr(time_seconds):
 def reportEpicsPvs(pvList):
     '''print all the PV values to stdout'''
     global db
-    xref = {}
-    fmt = "%20s\t%10s\t%36s\t%s"
-    for pv in pvList:
-        value = db[pv+',value']
-        last_update = db[pv+',time']
-        count = db[pv+',count']
-        timeStr = timeToStr(last_update)
-        xref[timeStr + pv] = fmt % (timeStr, count, pv, value)
-    keys = xref.keys()
-    keys.sort()
-    now = timeToStr(time.time())
+    t = pyRestTable.Table()
+    t.labels = ["time stamp", "# received", "PV name", "value"]
+    for pv in sorted(pvList):
+        timeStr = timeToStr(db[pv].timestamp)
+        t.rows.append( (timeStr, db[pv+',count'], pv, db[pv].value) )
     print "#" + ">"*60
-    print "# reportEpicsPvs(): " + now
-    print "#"+fmt % ("time stamp", "# received", "PV name", "value")
-    for key in keys:
-        print xref[key]
+    print "# reportEpicsPvs(): " + timeToStr(time.time())
+    print t.reST(),
     print "#" + "<"*60
 
 
@@ -85,15 +74,15 @@ def updateScanLog(lastScanningState):
     global cfg
     global db
     global pvTag
-    scanningState = db[pvTag['scanning']+',value']
+    scanningState = db[pvTag['scanning']].value
     if (scanningState != lastScanningState):
         if lastScanningState != 'initial':  # but not this case
-            directory = db[pvTag['directory']+',value']
-            fileName = db[pvTag['file']+',value']
+            directory = db[pvTag['directory']].value
+            fileName = db[pvTag['file']].value
             datafile = os.path.join(directory, fileName)
-            title = db[pvTag['title']+',value']
-            number = db[pvTag['number']+',value']
-            scanmacro = db[pvTag['scanmacro']+',value']
+            title = db[pvTag['title']].value
+            number = db[pvTag['number']].value
+            scanmacro = db[pvTag['scanmacro']].value
             if scanningState == 'scanning':
                 scanlog.startScanEntry(
                     cfg['scanLog'], number, datafile, title, scanmacro)
