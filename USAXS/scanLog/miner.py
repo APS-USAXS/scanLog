@@ -1,23 +1,21 @@
 #!/usr/bin/env python
 '''
-@author: Pete Jemian
-@purpose: Read a file with a list of possible SPEC file names
-          and search for USAXS scans (uascan and sbuascan).
-          Note information about those found and report back in
-          XML format.
-@note: This routine would be improved immensely by using standard
-          XML library support instead of writing strings in XML statements.
-          The standard library support would avert problems such as
-          invalid characters in the titles.
-'''
+search a file for USAXS scans (uascan and sbuascan)
 
-########### SVN repository information ###################
-# $Date$
-# $Author$
-# $Revision$
-# $HeadURL$
-# $Id$
-########### SVN repository information ###################
+:author: Pete Jemian
+
+Read a file with a list of possible SPEC file names
+and search for USAXS scans (uascan and sbuascan).
+Note information about those found and report back in
+XML format.
+
+.. note:: 
+   This routine would be improved immensely by using standard
+   XML library support instead of writing strings in XML statements.
+   The standard library support would avert problems such as
+   invalid characters in the titles.
+
+'''
 
 
 import sys
@@ -32,6 +30,7 @@ SCAN_TYPES_LOGGED = ['uascan', 'sbuascan', 'FlyScan', 'pinSAXS', 'WAXS']
 
 def dofile(filename):
     '''process one SPEC data file, looking for USAXS scans, add to DB'''
+    global DB
     # test it first to see if it is a SPEC data file
     next_comment_is_title = False
     scan_start_found = False
@@ -44,7 +43,7 @@ def dofile(filename):
             scanType = parts[2]
             scan_start_found = False
             if scanType in SCAN_TYPES_LOGGED:
-                id = parts[1]
+                scanid = parts[1]
                 scan_start_found = True
         elif signal == "#D":
             if scan_start_found:
@@ -69,28 +68,29 @@ def dofile(filename):
                     enddate = time.strftime("%Y-%m-%d", timestruct)
                     endtime = time.strftime("%H:%M:%S", timestruct)
                     # all information is gathered for one scan entry
-                    entry = build_entry(scanType, id, title, filename,
+                    entry = build_entry(scanType, scanid, title, filename,
                         startdate, starttime, enddate, endtime)
                     # add this to the DB dictionary
                     DB[sortkey] = entry
     f.close
 
 
-def build_entry(type, number, title, filename,
+def build_entry(scantype, number, title, filename,
                         startdate, starttime, enddate, endtime):
     '''return a dictionary from the supplied parameters'''
-    dict = {}
-    dict['id'] = "%s:%s" % (number, filename)
-    dict['type'] = type
-    dict['number'] = number
-    dict['title'] = title
-    dict['file'] = filename
-    dict['starteddate'] = startdate
-    dict['startedtime'] = starttime
-    dict['endeddate'] = enddate
-    dict['endedtime'] = endtime
-    dict['state'] = 'complete'
-    return dict
+    xref = dict(
+                id = "%s:%s" % (number, filename),
+                type = scantype,
+                number = number,
+                title = title,
+                file = filename,
+                starteddate = startdate,
+                startedtime = starttime,
+                endeddata = enddate,
+                endedtime = endtime,
+                state = 'complete',
+                )
+    return xref
 
 
 def is_spec_file(filename):
@@ -113,20 +113,15 @@ def is_spec_file(filename):
 
 def writeXmlFile(xmlFile, DB):
     '''write the XML file with the supplied dictionary'''
-    KEYS = DB.keys()
-    KEYS.sort()
-    #---
     # create the XML structure in memory
     root = ElementTree.Element(ROOT_ELEMENT)
     node = ElementTree.Element("created.by")
     node.text = sys.argv[0]
     node.set("datetime", time.ctime())
     root.append(node)
-    #---
-    KEYS = DB.keys()
-    KEYS.sort()
-    for key in KEYS:
-        dict = DB[key]
+
+    for key in sorted(DB.keys()):
+        xref = DB[key]
         """
             <scan id="29:/share1/USAXS_data/2010-03/03_24_setup.dat" number="29"
                 state="complete">
@@ -138,22 +133,24 @@ def writeXmlFile(xmlFile, DB):
         """
         scanNode = ElementTree.Element("scan")
         for item in ('id', 'number', 'state', 'type'):
-            scanNode.set(item, dict[item])
+            scanNode.set(item, xref[item])
         for item in ('title', 'file'):
             subNode = ElementTree.Element(item)
-            subNode.text = dict[item]
+            subNode.text = xref[item]
             scanNode.append(subNode)
         for item in ('started', 'ended'):
             subNode = ElementTree.Element(item)
             for part in ('date', 'time'):
-                subNode.set(part, dict[item+part])
+                subNode.set(part, xref[item+part])
             scanNode.append(subNode)
         root.append(scanNode)
     #---
     # wrap it in an ElementTree instance, and save as XML
     xmlSupport.writeXmlDocToFile(xmlFile, ElementTree.ElementTree(root))
 
-if __name__ == '__main__':
+
+def main():
+    global DB
     # create usaxs-spec-files.txt using the command line:
     #   locate .dat | grep /data | grep -v /archive | grep -v .Trash | grep -v livedata > usaxs-spec-files.txt
     filelist = 'usaxs-spec-files.txt'
@@ -169,3 +166,16 @@ if __name__ == '__main__':
     writeXmlFile("test.xml", DB)
     #---
     print "Found %d scans" % len(DB)
+
+
+if __name__ == '__main__':
+    main()
+
+
+########### SVN repository information ###################
+# $Date$
+# $Author$
+# $Revision$
+# $HeadURL$
+# $Id$
+########### SVN repository information ###################
