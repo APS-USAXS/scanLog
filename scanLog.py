@@ -81,12 +81,12 @@ def updateScanLog(lastScanningState):
             fileName = db[pvTag['file']].value
             datafile = os.path.join(directory, fileName)
             title = db[pvTag['title']].value
-            number = db[pvTag['number']].value
+            number = str(db[pvTag['number']].value)
             scanmacro = db[pvTag['scanmacro']].value
-            if scanningState == 'scanning':
+            if str(scanningState) in ( 'scanning', '1' ):
                 updates.startScanEntry(
                     cfg['scanLog'], number, datafile, title, scanmacro)
-            elif scanningState == 'no':
+            elif str(scanningState) in ( 'no', '0' ):
                 updates.endScanEntry(
                     cfg['scanLog'], number, datafile)
             else:
