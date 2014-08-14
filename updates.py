@@ -12,7 +12,7 @@ import xmlSupport
 
 #**************************************************************************
 
-MACROS_ALLOWED_TO_LOG = ('uascan', 'sbuascan', 'FlyScan', 'pinSAXS', 'WAXS')
+MACROS_ALLOWED_TO_LOG = ('uascan', 'sbuascan', 'FlyScan', 'pinSAXS', 'WAXS', 'USAXSImaging')
 
 #**************************************************************************
 
