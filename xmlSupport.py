@@ -37,8 +37,10 @@ def readConfigurationXML(pvListFile):
 #**************************************************************************
 
 def openScanLogFile(xmlFile):
-    '''open the XML file with ElementTree
-        return the doc (doc.getroot() to get the root node)'''
+    '''
+    open the XML file with ElementTree
+    return the doc (doc.getroot() to get the root node)
+    '''
     doc = None
     try:
         doc = ElementTree.parse(xmlFile)
@@ -49,8 +51,9 @@ def openScanLogFile(xmlFile):
 #**************************************************************************
 
 def locateScanID(doc, scanid):
-    '''find the XML scan entry with matching id attribute
-        return XML node or None if not found
+    '''
+    find the XML scan entry with matching id attribute
+    return XML node or None if not found
     '''
     result = None
     #query = "scan/[@id='%s']" % scanid
@@ -72,9 +75,11 @@ def flagRunawayScansAsUnknown(doc, scanid):
 #**************************************************************************
 
 def readFileAsLines(filename):
-    '''open a file and read all of it into 
-        memory as a list separated by line breaks,
-        return None if error or cannot find file'''
+    '''
+    open a file and read all of it into 
+    memory as a list separated by line breaks,
+    return None if error or cannot find file
+    '''
     if not os.path.exists(filename):
         return None
     try:
@@ -104,8 +109,10 @@ def prettyXml(element):
 
 
 def prettyXmlToString(element):
-    '''make nice-looking XML that is human-readable
-    @see http://stackoverflow.com/questions/749796/pretty-printing-xml-in-python'''
+    '''
+    make nice-looking XML that is human-readable
+    @see http://stackoverflow.com/questions/749796/pretty-printing-xml-in-python
+    '''
     txt = ElementTree.tostring(element)
     dom = xml.dom.minidom.parseString(txt)
     ugly = dom.toprettyxml()
