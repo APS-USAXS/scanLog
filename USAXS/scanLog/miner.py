@@ -152,7 +152,7 @@ def writeXmlFile(xmlFile, DB):
 def main():
     global DB
     # create usaxs-spec-files.txt using the command line:
-    #   locate .dat | grep /data | grep -v /archive | grep -v .Trash | grep -v livedata > usaxs-spec-files.txt
+    #   locate .dat | grep /share1/USAXS_data | grep -v /archive | grep -v .Trash | grep -v livedata > usaxs-spec-files.txt
     filelist = 'usaxs-spec-files.txt'
     #filelist = 'short-usaxs-spec-files.txt'
     DB = {}
