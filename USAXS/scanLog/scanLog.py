@@ -75,22 +75,21 @@ def updateScanLog(lastScanningState):
     global db
     global pvTag
     scanningState = db[pvTag['scanning']].value
-    if (scanningState != lastScanningState):
-        if lastScanningState != 'initial':  # but not this case
-            directory = db[pvTag['directory']].value
-            fileName = db[pvTag['file']].value
-            datafile = os.path.join(directory, fileName)
-            title = db[pvTag['title']].value
-            number = str(db[pvTag['number']].value)
-            scanmacro = db[pvTag['scanmacro']].value
-            if str(scanningState) in ( 'scanning', '1' ):
-                updates.startScanEntry(
-                    cfg['scanLog'], number, datafile, title, scanmacro)
-            elif str(scanningState) in ( 'no', '0' ):
-                updates.endScanEntry(
-                    cfg['scanLog'], number, datafile)
-            else:
-                print "this should not happen, state = ", scanningState
+    if scanningState != lastScanningState and lastScanningState != 'initial':
+        directory = db[pvTag['directory']].value
+        fileName = db[pvTag['file']].value
+        datafile = os.path.join(directory, fileName)
+        title = db[pvTag['title']].value
+        number = str(db[pvTag['number']].value)
+        scanmacro = db[pvTag['scanmacro']].value
+        if str(scanningState) in ( 'scanning', '1', 1 ):
+            updates.startScanEntry(
+                cfg['scanLog'], number, datafile, title, scanmacro)
+        elif str(scanningState) in ( 'no', '0', 0 ):
+            updates.endScanEntry(
+                cfg['scanLog'], number, datafile)
+        else:
+            print "this should not happen, state = ", scanningState
     return scanningState
 
 
@@ -117,7 +116,7 @@ def main():
     global pvList
     message = "# " + time.ctime()
     message += " PID=" + repr(os.getpid())
-    message += " starting on HOST=" + os.environ['HOST']
+    message += " starting on HOST=" + os.environ['HOSTNAME']
     message += " by user=" + os.environ['USER']
     print message
     sys.stdout.flush()
@@ -125,7 +124,7 @@ def main():
     db = {}
     pvList = []
     pvTag = {}
-    baseDir = '/home/beams/S15USAXS/Documents/eclipse/USAXS/scanLog'
+    baseDir = '/home/beams/USAXS/Documents/eclipse/USAXS/scanLog'
     cfg = xmlSupport.readConfigurationXML(os.path.join(baseDir, PVLIST_XML))
     if len(cfg) == 0:
         print "ERROR: could not read the configuration file"
