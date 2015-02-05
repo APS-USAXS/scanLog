@@ -19,7 +19,7 @@ import shutil
 
 
 # general use
-WWW_SERVER_ROOT = "usaxs@www-i.xray.aps.anl.gov"
+WWW_SERVER_ROOT = "webusaxs@www-i.xray.aps.anl.gov"
 SERVER_WWW_HOMEDIR = WWW_SERVER_ROOT + ":~"
 SERVER_WWW_LIVEDATA = os.path.join(SERVER_WWW_HOMEDIR, 'www/livedata')
 
@@ -31,7 +31,7 @@ SCP = "/usr/bin/scp"
 RSYNC = "/usr/bin/rsync"
 
 
-def scpToWebServer_Demonstrate(sourceFile, targetFile = ""):
+def scpToWebServer_Demonstrate(sourceFile, targetFile = None):
     '''
     Demonstrate a copy the local source file to the WWW server using scp BUT DON"T DO IT
     ...
@@ -44,7 +44,7 @@ def scpToWebServer_Demonstrate(sourceFile, targetFile = ""):
     return scpToWebServer_Demonstrate(sourceFile, targetFile, demo = True)
 
 
-def scpToWebServer(sourceFile, targetFile = "", demo = False):
+def scpToWebServer(sourceFile, targetFile = None, demo = False):
     '''
     Copy the local source file to the WWW server using scp.
     @param sourceFile: file in local file space relative to /share1/local_livedata
@@ -54,7 +54,7 @@ def scpToWebServer(sourceFile, targetFile = "", demo = False):
     '''
     if not os.path.exists(sourceFile):
         raise Exception("Local file not found: " + sourceFile)
-    if len(targetFile) == 0:
+    if targetFile is None:
         targetFile = os.path.split(sourceFile)[1]   # strip the path off
     destinationName = os.path.join(SERVER_WWW_LIVEDATA, targetFile)
     command = "%s -p %s %s" % (SCP, sourceFile, destinationName)
