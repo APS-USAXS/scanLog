@@ -20,13 +20,12 @@ import shutil
 
 # general use
 WWW_SERVER_ROOT = "usaxs@www-i.xray.aps.anl.gov"
-LIVEDATA_DIR = "www/livedata"
 SERVER_WWW_HOMEDIR = WWW_SERVER_ROOT + ":~"
-SERVER_WWW_LIVEDATA = os.path.join(SERVER_WWW_HOMEDIR, LIVEDATA_DIR)
-LOCAL_DATA_DIR = "/data"
-LOCAL_USAXS_DATA__DIR = LOCAL_DATA_DIR + "/USAXS_data"
-LOCAL_WWW = LOCAL_DATA_DIR + "/www"
-LOCAL_WWW_LIVEDATA = os.path.join(LOCAL_DATA_DIR, LIVEDATA_DIR)
+SERVER_WWW_LIVEDATA = os.path.join(SERVER_WWW_HOMEDIR, 'www/livedata')
+
+LOCAL_DATA_DIR = "/share1"
+LOCAL_USAXS_DATA_DIR = os.path.join(LOCAL_DATA_DIR, "USAXS_data")
+LOCAL_WWW_LIVEDATA = os.path.join(LOCAL_DATA_DIR, 'local_livedata')
 
 SCP = "/usr/bin/scp"
 RSYNC = "/usr/bin/rsync"
@@ -38,7 +37,7 @@ def scpToWebServer_Demonstrate(sourceFile, targetFile = ""):
     ...
     ... this is useful for code development only...
     ...
-    @param sourceFile: file in local file space *relative* to /data/www/livedata
+    @param sourceFile: file in local file space *relative* to /share1/local_livedata
     @param targetFile: destination file (default is same path as sourceFile)
     @return: None
     '''
@@ -48,7 +47,7 @@ def scpToWebServer_Demonstrate(sourceFile, targetFile = ""):
 def scpToWebServer(sourceFile, targetFile = "", demo = False):
     '''
     Copy the local source file to the WWW server using scp.
-    @param sourceFile: file in local file space relative to /data/www/livedata
+    @param sourceFile: file in local file space relative to /share1/local_livedata
     @param targetFile: destination file (default is same path as sourceFile)
     @param demo: If True, don't do the copy, just print the command
     @return: a tuple (stdoutdata,  stderrdata) -or- None (if demo=False)
