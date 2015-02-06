@@ -23,7 +23,7 @@ spec_file_cache = None
 
 
 class ScanCache(object):
-    '''maintain a cache of scans already parsed'''
+    '''cache of scans already parsed'''
     # singleton class
     
     def __init__(self):
@@ -39,12 +39,16 @@ class ScanCache(object):
         if key in self.db:
             return self.db[key]
     
+    def get_keys(self):
+        return self.db.keys()
+    
     def delete(self, key):
         if key in self.db:
             del self.db[key]
 
 
 class SpecFileObject(object):
+    '''contents and metadata about a SPEC data file on disk'''
     
     def __init__(self, specfile):
         if os.path.exists(specfile):
@@ -56,7 +60,7 @@ class SpecFileObject(object):
 
 
 class SpecFileCache(object):
-    '''maintain a cache of SPEC data files already parsed'''
+    '''cache of SPEC data files already parsed'''
     # singleton class
     
     def __init__(self):
@@ -83,12 +87,16 @@ class SpecFileCache(object):
         
         return self._add_(specfile).sdf_object
     
+    def get_keys(self):
+        return self.db.keys()
+    
     def _del_(self, key):
         if key in self.db:
             del self.db[key]
 
 
 class Scan(object):
+    '''details about a scan that could be plotted'''
     
     def __init__(self):
         self.title = None
@@ -224,7 +232,7 @@ def last_n_scans(xml_log_file, number_scans):
             scans.append(scan_object)
             if len(scans) == number_scans:
                 break
-    return reversed(scans)
+    return list(reversed(scans))
 
 
 def main():
