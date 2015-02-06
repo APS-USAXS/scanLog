@@ -7,7 +7,7 @@
 
 ###### crontab -e task #########################
 # build: http://usaxs.xray.aps.anl.gov/livedata/scanlog.xml
-#  */5 * * * * /home/beams/USAXS/Documents/eclipse/USAXS/livedata/scanlog.csh checkup 2>&1 /dev/null
+#  */5 * * * * /home/beams/USAXS/Documents/eclipse/USAXS/scanLog/scanlog.csh checkup 2>&1 /dev/null
 ################################################
 
 
