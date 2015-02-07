@@ -3,61 +3,79 @@
 '''demo use of MatPlotLib for the USAXS livedata plots'''
 
 
-import os
-import matplotlib as mpl
+import datetime
 import matplotlib.pyplot as plt
-from matplotlib import font_manager
-#mpl.rcParams['text.usetex'] = True
 import numpy as np
 
+BISQUE_RGB    = (255./255, 228./255, 196./255)  # 255 228 196 bisque
+MINTCREAM_RGB = (245./255, 255./255, 250./255)  # 245 255 250 MintCream
 
-class Dataset(object):
-    x = None
-    y = None
+SYMBOL_LIST = ("^", "D", "s", "v", "<", ">")
+COLOR_LIST = ("green", "purple", "blue", "black", "orange") # red is NOT in the list
+
+CHART_FILE = 'livedata.png'
+
+
+class Plottable_USAXS_Dataset(object):
+    Q = None
+    I = None
     label = None
 
 
-def plot_data(datasets, title, plotfile):
-    fig = plt.figure()
-    # TODO: set backgrond outside plot frame to bisque
-    bisque_rgb = (255./255, 228./255, 196./255)  # 255 228 196 bisque
-    mintcream_rgb = (245./255, 255./255, 250./255)  # 245 255 250 MintCream
-    ax = fig.add_subplot('111', axisbg=mintcream_rgb)
+def livedata_plot(datasets, plotfile):
+    '''
+    generate the USAXS livedata plot
+    
+    :param [Plottable_USAXS_Dataset] datasets: USAXS data to be plotted, newest data last
+    :param str plotfile: file name to write plot image
+    '''
+    fig = plt.figure(figsize=(7.5, 8), dpi=300)
+
+    ax = fig.add_subplot('111', axisbg=MINTCREAM_RGB)
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlabel(r'$|Q|, 1/\AA$')
-    ax.set_ylabel(r'$I$, a.u.')
-    ax.grid(True)
-    for ds in datasets:
-        ax.plot(ds.x, ds.y, label=ds.label)
-    plt.title(title)
-    plt.legend(loc='lower left', prop=font_manager.FontProperties(size=10))
-    plt.savefig(plotfile, bbox_inches='tight')
+    ax.set_ylabel(r'Raw Intensity ($I$), a.u.')
+    ax.grid(True, which='both')
+
+    for i, ds in enumerate(datasets):
+        if i < len(datasets)-1:
+            color = COLOR_LIST[i % len(COLOR_LIST)]
+            symbol = SYMBOL_LIST[i % len(SYMBOL_LIST)]
+        else:
+            color = 'red'
+            symbol = 'o'
+        ax.plot(ds.Q, ds.I, symbol, label=ds.label, mfc='w', mec=color, ms=3, mew=1)
+
+    title = 'APS/XSD USAXS: ' + str(datetime.datetime.now())
+    plt.title(title, fontsize=12)
+    plt.legend(loc='lower left', fontsize=10)   # FIXME: plots two symbols for each dataset
+    plt.savefig(plotfile, bbox_inches='tight', facecolor=BISQUE_RGB)
 
 
 def main():
     x = np.arange(0.105, 2*np.pi, 0.01)
-    ds1 = Dataset()
-    ds1.x = x
-    ds1.y = np.sin(x**2) * np.exp(-x)
+    ds1 = Plottable_USAXS_Dataset()
+    ds1.Q = x
+    ds1.I = np.sin(x**2) * np.exp(-x) + 1.0e-5
     ds1.label = 'sin(x^2) exp(-x)'
     
-    ds2 = Dataset()
-    ds2.x = x
-    ds2.y = ds1.y**2
+    ds2 = Plottable_USAXS_Dataset()
+    ds2.Q = x
+    ds2.I = ds1.I**2 + 1.0e-5
     ds2.label = '$[\sin(x^2)\cdot\exp(-x)]^2$'
     
-    ds3 = Dataset()
-    ds3.x = x
-    ds3.y = np.sin(5*x) / (5*x)
+    ds3 = Plottable_USAXS_Dataset()
+    ds3.Q = x
+    ds3.I = np.sin(5*x) / (5*x)  + 1.0e-5
     ds3.label = 'sin(5x)/(5x)'
     
-    ds4 = Dataset()
-    ds4.x = x
-    ds4.y = (np.sin(5*x) / (5*x))**2
+    ds4 = Plottable_USAXS_Dataset()
+    ds4.Q = x
+    ds4.I = ds3.I**2 + 1.0e-5
     ds4.label = r'$[\sin(5x)/(5x)]^2$'
     
-    plot_data([ds2, ds4], 'Something wonderful', 'demo_mpl.png')
+    livedata_plot([ds2, ds4], CHART_FILE)
 
 
 #**************************************************************************
