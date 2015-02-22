@@ -3,7 +3,9 @@
 '''watch EPICS PVs for user scan events and log to XML file'''
 
 
+import getpass
 import os
+import platform
 import sys
 import time
 import epics        # PyEpics
@@ -114,10 +116,12 @@ def main():
     global db
     global pvTag
     global pvList
+    host = platform.node().split('.')[0]
+    user = getpass.getuser()
     message = "# " + time.ctime()
     message += " PID=" + repr(os.getpid())
-    message += " starting on HOST=" + os.environ['HOSTNAME']
-    message += " by user=" + os.environ['USER']
+    message += " starting on HOST=" + host
+    message += " by user=" + user
     print message
     sys.stdout.flush()
 

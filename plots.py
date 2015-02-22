@@ -165,7 +165,7 @@ class Scan(object):
 
 def plottable_scan(scan_node):
     '''
-    Determine if the scan_node is plottable
+    Determine if the scan_node (XML) is plottable
     
     :param obj scan_node: scan_node entry (instance of XML _Element node)
     :return obj: instance of Scan or None
@@ -223,6 +223,7 @@ def plottable_scan(scan_node):
 
 
 def last_n_scans(xml_log_file, number_scans):
+    '''get list of last *n* plottable scan objects, chronological, most recent last'''
     xml_doc = xmlSupport.openScanLogFile(xml_log_file)
 
     scans = []
@@ -242,6 +243,9 @@ def main():
     scan_cache = ScanCache()
     spec_file_cache = SpecFileCache()
     scans = last_n_scans(SCANLOG, NUMBER_SCANS_TO_PLOT)
+    
+    
+    
     print '\n'.join(['%s     %s' % (_.safe_id, str(_)) for _ in scans])
 
 
