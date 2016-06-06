@@ -5,6 +5,7 @@
 
 import getpass
 import os
+os.environ['HDF5_DISABLE_VERSION_CHECK'] = '2'
 import platform
 import sys
 import time
@@ -158,7 +159,7 @@ def main():
             nextReport = time.time() + reportInterval_seconds
             reportEpicsPvs(pvList)
         sys.stdout.flush()
-        time.sleep(1)   # Is it possible to miss a transition at 1 Hz?
+        time.sleep(0.1)   # Is it possible to miss a transition at 10 Hz?
 
 #-------------------------------------------------------------
 
