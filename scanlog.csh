@@ -13,6 +13,7 @@
 
 #setenv PYTHON  /APSshare/epd/rh6-x86_64/bin/python
 setenv PYTHON  /APSshare/anaconda/x86_64/bin/python
+setenv HDF5_DISABLE_VERSION_CHECK 2
 
 setenv HOME_DIR /home/beams/USAXS
 setenv BASE_DIR ${HOME_DIR}/Documents/eclipse/USAXS/scanLog
