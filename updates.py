@@ -7,6 +7,7 @@
 import datetime
 import os
 import sys
+import threading
 from xml.etree import ElementTree
 import wwwServerTransfers
 import xmlSupport
@@ -24,9 +25,9 @@ def usage():
     print 'usage:  updates.py start|end number fileName "the title" specScanMacro'
 
 
-def buildID(number, fileName):
+def buildID(number, data_file_name):
     ''' return the unique scan index ID based on scan number and file name '''
-    return "%s:%s" % (number, fileName)
+    return "%s:%s" % (number, data_file_name)
 
 
 def timestamp():
@@ -34,36 +35,38 @@ def timestamp():
     return str(datetime.datetime.now()).split('.')[0]
 
 
-def startScanEntry(scanLogFile, number, fileName, title, macro):
+def startScanEntry(scanLogFile, number, data_file_name, title, macro):
     ''' Start a new scan in the XML file '''
     if not macro in MACROS_ALLOWED_TO_LOG:
         return  # ignore this one
-    scanID = buildID(number, fileName)
+    scanID = buildID(number, data_file_name)
     
     event = {
              'number': number,
              'phase': 'start',
-             'id': scanID,
-             'type': macro,
+             'scanID': scanID,
+             'macro': macro,
              'title': title,
              'timestamp': timestamp(),
-             'file': fileName,
+             'datetime_full': str(datetime.datetime.now()),
+             'data_file_name': data_file_name,
              'xml_file_name': scanLogFile,
              }
     queue = get_event_queue_object()
     queue.add_event(event)   # process event in a different thread
 
 
-def endScanEntry(scanLogFile, number, fileName):
+def endScanEntry(scanLogFile, number, data_file_name):
     ''' Set the ending time for the scan in the XML file '''
-    scanID = buildID(number, fileName)  # index using scanID (above)
+    scanID = buildID(number, data_file_name)  # index using scanID (above)
 
     event = {
              'number': number,
              'phase': 'end',
-             'id': scanID,
+             'scanID': scanID,
              'timestamp': timestamp(),
-             'file': fileName,
+             'datetime_full': str(datetime.datetime.now()),
+             'data_file_name': data_file_name,
              'xml_file_name': scanLogFile,
              }
     queue = get_event_queue_object()
@@ -103,6 +106,11 @@ def event_processing(fifo, callback_function=None):
                 print "ERROR: Could not open file: " + xml_file_name
                 return
 
+        scanID = event.get('scanID')
+        if scanID is None:
+            print "ERROR: Could not find 'scanID' in the event data: " + str(event)
+            return
+
         if event['phase'] == 'start':
             scanNode = xmlSupport.locateScanID(doc, scanID)
             if scanNode is not None:
@@ -120,13 +128,13 @@ def event_processing(fifo, callback_function=None):
             root.append(scanNode)
          
             xmlSupport.appendTextNode(doc, scanNode, 'title', event['title'])
-            xmlSupport.appendTextNode(doc, scanNode, 'file', event['fileName'])
+            xmlSupport.appendTextNode(doc, scanNode, 'file', event['data_file_name'])
             xmlSupport.appendDateTimeNode(doc, scanNode, 'started', event['timestamp'])
          
             xmlSupport.flagRunawayScansAsUnknown(doc, scanID)
 
         elif event['phase'] == 'end':
-            scanNode = xmlSupport.locateScanID(doc, event['scanID'])
+            scanNode = xmlSupport.locateScanID(doc, scanID)
             if scanNode is None:
                 #print "ERROR: Could not find that scan in the log file."
                 return
@@ -184,7 +192,7 @@ class EventQueue(object):
         Run the processing step.  If processing is already running,
         the callback will catch up with the new queue entries eventually.
         '''
-        self.fifo.append(event)
+        self.fifo.append(*event)
         self.process_queue()
     
     def callback(self):
