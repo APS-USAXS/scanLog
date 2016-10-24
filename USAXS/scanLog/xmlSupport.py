@@ -5,6 +5,7 @@
 import os.path
 import re
 import sys
+import datetime
 import time
 from xml.etree import ElementTree
 import xml.dom.minidom
@@ -151,11 +152,12 @@ def appendTextNode(doc, parent, tag, value):
 
 #**************************************************************************
 
-def appendDateTimeNode(doc, parent, tag):
+def appendDateTimeNode(doc, parent, tag, timestamp):
     '''append a date/time node to the XML document'''
+    ymd, hms = timestamp.split()
     elem = ElementTree.Element(tag)
-    elem.set('date', xmlDate())
-    elem.set('time', xmlTime())
+    elem.set('date', ymd)
+    elem.set('time', hms)
     parent.append(elem)
 
 #**************************************************************************
@@ -190,7 +192,7 @@ def main():
     scan.set("gotcha", "True")
     print prettyXmlToString(scan)
     appendTextNode(doc, root, "modifed.by", sys.argv[0])
-    appendDateTimeNode(doc, root, "timestamp")
+    appendDateTimeNode(doc, root, "timestamp", str(datetime.datetime.now()))
     #print prettyXml(root)
     writeXmlDocToFile('test.xml', doc)
 
