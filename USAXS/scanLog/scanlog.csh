@@ -64,6 +64,7 @@ switch (${SELECTION})
         if (${pid} != ${test}) then
         	echo "# `/bin/date` could not identify running process ${pid}, restarting" >>& ${LOGFILE}
         	echo `${THIS_FILE} restart` >& /dev/null
+        	${SNAME} restart
         endif
         breaksw
 
