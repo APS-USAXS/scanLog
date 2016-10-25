@@ -140,7 +140,7 @@ def event_processing(fifo, callback_function=None):
                 return
             if (scanNode.get('state') == 'scanning'):
                 scanNode.set('state', 'complete')   # set scan/@state="complete"
-                xmlSupport.appendDateTimeNode(doc, scanNode, 'ended', event['timestamp'])
+                xmlSupport.appendDateTimeNode(doc, scanNode, 'ended', event['datetime_full'])
 
         else:
             msg = 'unexpected scan event phase: ' + event['phase']
