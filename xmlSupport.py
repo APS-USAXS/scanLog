@@ -153,11 +153,20 @@ def appendTextNode(doc, parent, tag, value):
 #**************************************************************************
 
 def appendDateTimeNode(doc, parent, tag, timestamp):
-    '''append a date/time node to the XML document'''
+    '''
+    append a date/time node to the XML document
+    
+    :param obj doc: instance of xml.etree.Document
+    :param obj parent: instance of xml.etree.Element
+    :param str tag: name of element, form: yyyy-mm-dd hh:mm:ss.ffffff
+    :param str timestamp: str(datetime.datetime.now())
+    '''
     ymd, hms = timestamp.split()
+    hms = hms.split('.')[0]
     elem = ElementTree.Element(tag)
     elem.set('date', ymd)
     elem.set('time', hms)
+    elem.set('full', timestamp)
     parent.append(elem)
 
 #**************************************************************************
