@@ -129,7 +129,7 @@ def event_processing(fifo, callback_function=None):
          
             xmlSupport.appendTextNode(doc, scanNode, 'title', event['title'])
             xmlSupport.appendTextNode(doc, scanNode, 'file', event['data_file_name'])
-            xmlSupport.appendDateTimeNode(doc, scanNode, 'started', event['timestamp'])
+            xmlSupport.appendDateTimeNode(doc, scanNode, 'started', event['datetime_full'])
          
             xmlSupport.flagRunawayScansAsUnknown(doc, scanID)
 
