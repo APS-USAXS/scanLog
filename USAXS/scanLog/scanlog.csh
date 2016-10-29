@@ -23,11 +23,13 @@ setenv SCRIPT  ${BASE_DIR}/scanLog.py
 setenv LOGFILE ${WWW_DIR}/scanlog.log
 setenv PIDFILE ${WWW_DIR}/scanlog.pid
 
+setenv DATE "/bin/date --rfc-3339='seconds'"
+
 setenv SNAME $0
 setenv SELECTION $1
 
-/bin/echo "#${SNAME} ${SELECTION}>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"  >>& ${LOGFILE} 
-/bin/echo "# date: `date`"  >>& ${LOGFILE} 
+#/bin/echo "#${SNAME} ${SELECTION}>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"  >>& ${LOGFILE} 
+/bin/echo "# `${DATE}` ${SNAME} ${SELECTION}"  >>& ${LOGFILE} 
 #/bin/echo "# env: `env|sort`"  >>& ${LOGFILE} 
 
 switch (${SELECTION})
@@ -37,7 +39,7 @@ switch (${SELECTION})
         /bin/rm ${PIDFILE}
         /bin/echo ${PID} > ${PIDFILE}
         /bin/echo "started ${PID}: ${PYTHON} ${SCRIPT}"
-        /bin/echo "# `/bin/date`: started ${PID}: ${SCRIPT}" >>& ${LOGFILE}
+        /bin/echo "# `${DATE}`: started ${PID}: ${SCRIPT}" >>& ${LOGFILE}
         breaksw
 
   case "stop":
@@ -49,7 +51,7 @@ switch (${SELECTION})
         else
              kill ${PID}
              /bin/echo "stopped ${PID}: ${SCRIPT}"
-             /bin/echo "# `/bin/date`: stopped ${PID}: ${SCRIPT}" >>& ${LOGFILE}
+             /bin/echo "# `${DATE}`: stopped ${PID}: ${SCRIPT}" >>& ${LOGFILE}
         endif
         breaksw
 
@@ -62,7 +64,7 @@ switch (${SELECTION})
         set pid = `/bin/cat ${PIDFILE}`
         set test = `/bin/ps -p ${pid} --no-header -o pid`
         if (${pid} != ${test}) then
-        	echo "# `/bin/date` could not identify running process ${pid}, restarting" >>& ${LOGFILE}
+        	echo "# `${DATE}` could not identify running process ${pid}, restarting" >>& ${LOGFILE}
         	echo `${THIS_FILE} restart` >& /dev/null
         	${SNAME} restart
         endif
@@ -74,7 +76,7 @@ switch (${SELECTION})
 
 endsw
 
-/bin/echo "#${SNAME} ${SELECTION}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"  >>& ${LOGFILE} 
+#/bin/echo "#${SNAME} ${SELECTION}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"  >>& ${LOGFILE} 
 
 
 
