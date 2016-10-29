@@ -11,6 +11,7 @@ import threading
 from xml.etree import ElementTree
 import wwwServerTransfers
 import xmlSupport
+from reporting import errorReport, printReport
 
 #**************************************************************************
 
@@ -53,6 +54,7 @@ def startScanEntry(scanLogFile, number, data_file_name, title, macro):
              'xml_file_name': scanLogFile,
              }
     queue = get_event_queue_object()
+    printReport("scan start detected", scanID, use_separators=False)
     queue.add_event(event)   # process event in a different thread
 
 
@@ -70,10 +72,11 @@ def endScanEntry(scanLogFile, number, data_file_name):
              'xml_file_name': scanLogFile,
              }
     queue = get_event_queue_object()
+    printReport("scan end detected", scanID, use_separators=False)
     queue.add_event(event)   # process event in a different thread
 
 
-def event_processing(fifo, callback_function=None):
+def event_processing(fifo, q_id, callback_function=None):
     '''
     process the event queue and add to XML file
     
@@ -101,21 +104,24 @@ def event_processing(fifo, callback_function=None):
         if doc is None:
             # load and parse the XML file using lxml.etree
             xml_file_name = event['xml_file_name']
+	    printReport(q_id + ': opening XML file', use_separators=False)
             doc = xmlSupport.openScanLogFile(xml_file_name)
             if doc is None:
-                print "ERROR: Could not open file: " + xml_file_name
+                errorReport(q_id + ": Could not open file: " + xml_file_name)
                 return
+	    printReport(q_id + ': XML file opened', use_separators=False)
 
         scanID = event.get('scanID')
         if scanID is None:
-            print "ERROR: Could not find 'scanID' in the event data: " + str(event)
-            return
+            errorReport(q_id + ": Could not find 'scanID' in the event data: " + str(event))
+            continue
 
         if event['phase'] == 'start':
-            scanNode = xmlSupport.locateScanID(doc, scanID)
+            printReport(q_id + ': add event to XML', 'start', use_separators=False)
+	    scanNode = xmlSupport.locateScanID(doc, scanID)
             if scanNode is not None:
-                print "ERROR: One or more scans matches in the log file."
-                return
+                errorReport(q_id + ": One or more scans matches in the log file.")
+                continue
          
             root = doc.getroot()
             scanNode = ElementTree.Element('scan')
@@ -134,28 +140,40 @@ def event_processing(fifo, callback_function=None):
             xmlSupport.flagRunawayScansAsUnknown(doc, scanID)
 
         elif event['phase'] == 'end':
+            printReport(q_id + ': add event to XML', 'end', use_separators=False)
             scanNode = xmlSupport.locateScanID(doc, scanID)
             if scanNode is None:
-                #print "ERROR: Could not find that scan in the log file."
-                return
+                errorReport(q_id + ": Could not find scan in the log file: " + str(scanID))
+                continue
             if (scanNode.get('state') == 'scanning'):
                 scanNode.set('state', 'complete')   # set scan/@state="complete"
                 xmlSupport.appendDateTimeNode(doc, scanNode, 'ended', event['datetime_full'])
 
         else:
-            msg = 'unexpected scan event phase: ' + event['phase']
+            msg = q_id + ': unexpected scan event phase: ' + event['phase']
             raise RuntimeError(msg)
 
-    # write the XML to disk
-    # TODO set demo=False   With above, fixes Trac ticket #9
-    xmlSupport.writeXmlDocToFile(xml_file_name, doc)
+    try:
+        # write the XML to disk
+        # TODO set demo=False	With above, fixes Trac ticket #9
+        printReport(q_id + ': starting XML file write', use_separators=False)
+        xmlSupport.writeXmlDocToFile(xml_file_name, doc)
+        printReport(q_id + ': XML file written', use_separators=False)
+    except Exception as exc:
+        printReport(q_id + ': Exception while writing XML', str(exc))
+        
+    try:
+        printReport(q_id + ': scp transfer to WWW server started', use_separators=False)
+        wwwServerTransfers.scpToWebServer(xml_file_name,
+        	      os.path.split(xml_file_name)[-1], demo = False)
+        printReport(q_id + ': scp transfer to WWW server complete', use_separators=False)
+    except Exception as exc:
+        printReport(q_id + ': Exception while copying to WWW server', str(exc))
 
-    wwwServerTransfers.scpToWebServer(xml_file_name, 
-                  os.path.split(xml_file_name)[-1], demo = False)
 
     # check if the queue has more events to be processed
     if callback_function is not None:
-        callback_function()             # inform the caller this thread is done
+        callback_function(q_id)      # inform the caller this thread is done
 
 
 def get_event_queue_object():
@@ -184,6 +202,7 @@ class EventQueue(object):
 
         self.fifo = []      # the event queue
         self.processing = False
+	self.q_id = 0
     
     def add_event(self, *event):
         '''
@@ -195,7 +214,7 @@ class EventQueue(object):
         self.fifo.append(*event)
         self.process_queue()
     
-    def callback(self):
+    def callback(self, q_id):
         '''
         check the queue and process any remaining events
         
@@ -206,7 +225,10 @@ class EventQueue(object):
         '''
         self.processing = False
         if len(self.fifo) > 0:
-            self.process_queue()
+            msg = " # new events = " + str(len(self.fifo))
+	    printReport(q_id + ": processing additional events in queue", msg, use_separators=False)
+	    self.process_queue()
+	printReport(q_id + ": thread completed", use_separators=False)
 
     def process_queue(self):
         '''
@@ -217,12 +239,16 @@ class EventQueue(object):
         if len(self.fifo) == 0 or self.processing:
             return
         self.processing = True
+	self.q_id += 1
+	qStr = 'Thread-' + str(self.q_id)
         work_queue = list(self.fifo)
 
         self.fifo = self.fifo[len(work_queue):]
         thread = threading.Thread(target=event_processing, 
-                                  args=(work_queue, self.callback))
+                                  args=(work_queue, qStr, self.callback))
+	printReport(qStr + ": thread starting", thread.name, use_separators=False)
         thread.start()
+
 
 
 #-------------------------------------------------
