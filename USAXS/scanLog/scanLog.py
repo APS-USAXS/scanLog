@@ -13,6 +13,7 @@ import epics        # PyEpics
 import xmlSupport   # local support for the log file of USAXS scans
 import updates      # local support for configuration (PV list)
 import pyRestTable  # formatted tabular output
+from reporting import errorReport, printReport
 
 
 #-------------------------------------------------------------
@@ -95,16 +96,6 @@ def updateScanLog(lastScanningState):
             print "this should not happen, state = ", scanningState
     return scanningState
 
-
-#-------------------------------------------------------------
-
-def errorReport(message):
-    '''report an error to stdout'''
-    print "#------------------------------"
-    print "# ", time.ctime(), " Python error report:"
-    print message
-    print "#------------------------------"
-
 #-------------------------------------------------------------
 
 SCANLOG_XML = 'scanlog.xml'
@@ -119,11 +110,11 @@ def main():
     global pvList
     host = platform.node().split('.')[0]
     user = getpass.getuser()
-    message = "# " + time.ctime()
+    message = "# "
     message += " PID=" + repr(os.getpid())
     message += " starting on HOST=" + host
     message += " by user=" + user
-    print message
+    printReport("scanLog startup", message, use_separators=False)
     sys.stdout.flush()
 
     db = {}
@@ -132,7 +123,7 @@ def main():
     baseDir = '/home/beams/USAXS/Documents/eclipse/USAXS/scanLog'
     cfg = xmlSupport.readConfigurationXML(os.path.join(baseDir, PVLIST_XML))
     if len(cfg) == 0:
-        print "ERROR: could not read the configuration file"
+        errorReport("could not read the configuration file")
         return
     cfg['scanLog'] = os.path.join(cfg['local_www_dir'], cfg['scanLogFile'])
 
@@ -146,9 +137,7 @@ def main():
     reportInterval_seconds = 30*60  # dump out the PV values to stdout
     nextReport = time.time()        # make first reportEpicsPvs right away
 
-    print "#------------------------------"
-    print "# ", time.ctime(), " Started"
-    print "#------------------------------"
+    printReport("starting main event loop", use_separators=False)
     while 1:
         epics.ca.poll() # receives all PV monitors, not just for ch
         try:
