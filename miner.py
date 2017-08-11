@@ -26,7 +26,7 @@ import xmlSupport
 
 ROOT_ELEMENT = "USAXS_SCAN_LOG"
 
-SCAN_TYPES_LOGGED = ['uascan', 'sbuascan', 'FlyScan', 'pinSAXS', 'WAXS', 'USAXSImaging']
+SCAN_TYPES_LOGGED = ['uascan', 'sbuascan', 'FlyScan', 'pinSAXS', 'SAXS', 'WAXS', 'USAXSImaging']
 
 def dofile(filename):
     '''process one SPEC data file, looking for USAXS scans, add to DB'''

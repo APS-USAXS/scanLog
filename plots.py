@@ -155,7 +155,7 @@ class Scan(object):
                 self.spec_scan = self.getSpecScan()
             # TODO: reduce
             pass
-        elif self.scan_type in ('pinSAXS'):
+        elif self.scan_type in ('pinSAXS', 'SAXS'):
             pass
         elif self.scan_type in ('WAXS'):
             pass

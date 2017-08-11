@@ -15,7 +15,7 @@ from reporting import errorReport, printReport
 
 #**************************************************************************
 
-MACROS_ALLOWED_TO_LOG = ('uascan sbuascan FlyScan sbFlyScan pinSAXS WAXS USAXSImaging'.split())
+MACROS_ALLOWED_TO_LOG = ('uascan sbuascan FlyScan sbFlyScan pinSAXS SAXS WAXS USAXSImaging'.split())
 processing_queue = None # singleton: there is one, and only one, event processing queue
 
 #**************************************************************************
