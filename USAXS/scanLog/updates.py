@@ -9,9 +9,13 @@ import os
 import sys
 import threading
 from xml.etree import ElementTree
-import wwwServerTransfers
 import xmlSupport
 from reporting import errorReport, printReport
+
+path = os.path.dirname(__file__)
+path = os.path.join(path, "..")
+sys.path.append(os.path.abspath(path))
+from livedata import wwwServerTransfers
 
 #**************************************************************************
 
@@ -104,12 +108,12 @@ def event_processing(fifo, q_id, callback_function=None):
         if doc is None:
             # load and parse the XML file using lxml.etree
             xml_file_name = event['xml_file_name']
-	    printReport(q_id + ': opening XML file', use_separators=False)
+            printReport(q_id + ': opening XML file', use_separators=False)
             doc = xmlSupport.openScanLogFile(xml_file_name)
             if doc is None:
                 errorReport(q_id + ": Could not open file: " + xml_file_name)
                 return
-	    printReport(q_id + ': XML file opened', use_separators=False)
+            printReport(q_id + ': XML file opened', use_separators=False)
 
         scanID = event.get('scanID')
         if scanID is None:
@@ -118,7 +122,7 @@ def event_processing(fifo, q_id, callback_function=None):
 
         if event['phase'] == 'start':
             printReport(q_id + ': add event to XML', 'start', use_separators=False)
-	    scanNode = xmlSupport.locateScanID(doc, scanID)
+            scanNode = xmlSupport.locateScanID(doc, scanID)
             if scanNode is not None:
                 errorReport(q_id + ": One or more scans matches in the log file.")
                 continue
@@ -155,7 +159,7 @@ def event_processing(fifo, q_id, callback_function=None):
 
     try:
         # write the XML to disk
-        # TODO set demo=False	With above, fixes Trac ticket #9
+        # TODO set demo=False   With above, fixes Trac ticket #9
         printReport(q_id + ': starting XML file write', use_separators=False)
         xmlSupport.writeXmlDocToFile(xml_file_name, doc)
         printReport(q_id + ': XML file written', use_separators=False)
@@ -163,10 +167,22 @@ def event_processing(fifo, q_id, callback_function=None):
         printReport(q_id + ': Exception while writing XML', str(exc))
         
     try:
-        printReport(q_id + ': scp transfer to WWW server started', use_separators=False)
-        wwwServerTransfers.scpToWebServer(xml_file_name,
-        	      os.path.split(xml_file_name)[-1], demo = False)
-        printReport(q_id + ': scp transfer to WWW server complete', use_separators=False)
+        printReport(q_id + ': transfer to WWW server started', use_separators=False)
+
+        source = xml_file_name
+        path = os.path.dirname(source)
+        files = "scanlog.xml scanlog.log"
+        #printReport(q_id + ': transferring:', message=source, use_separators=False)
+        target = wwwServerTransfers.SERVER_WWW_LIVEDATA
+        command = wwwServerTransfers.RSYNC
+        command += " -rRtz %s %s" % (files, target)
+        printReport(q_id + ': command', message=command, use_separators=False)
+        owd = os.getcwd()
+        os.chdir(path)
+        wwwServerTransfers.execute_command(command)
+        os.chdir(owd)
+
+        printReport(q_id + ': transfer to WWW server complete', use_separators=False)
     except Exception as exc:
         printReport(q_id + ': Exception while copying to WWW server', str(exc))
 
@@ -202,7 +218,7 @@ class EventQueue(object):
 
         self.fifo = []      # the event queue
         self.processing = False
-	self.q_id = 0
+        self.q_id = 0
     
     def add_event(self, *event):
         '''
@@ -226,9 +242,9 @@ class EventQueue(object):
         self.processing = False
         if len(self.fifo) > 0:
             msg = " # new events = " + str(len(self.fifo))
-	    printReport(q_id + ": processing additional events in queue", msg, use_separators=False)
-	    self.process_queue()
-	printReport(q_id + ": thread completed", use_separators=False)
+            printReport(q_id + ": processing additional events in queue", msg, use_separators=False)
+            self.process_queue()
+            printReport(q_id + ": thread completed", use_separators=False)
 
     def process_queue(self):
         '''
@@ -239,14 +255,14 @@ class EventQueue(object):
         if len(self.fifo) == 0 or self.processing:
             return
         self.processing = True
-	self.q_id += 1
-	qStr = 'Thread-' + str(self.q_id)
+        self.q_id += 1
+        qStr = 'Thread-' + str(self.q_id)
         work_queue = list(self.fifo)
 
         self.fifo = self.fifo[len(work_queue):]
         thread = threading.Thread(target=event_processing, 
                                   args=(work_queue, qStr, self.callback))
-	printReport(qStr + ": thread starting", thread.name, use_separators=False)
+        printReport(qStr + ": thread starting", thread.name, use_separators=False)
         thread.start()
 
 
