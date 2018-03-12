@@ -1,13 +1,4 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!--
-########### SVN repository information ###################
-# $Date: 2009-02-22 15:30:17 -0600 (Sun, 22 Feb 2009) $
-# $Author: jemian $
-# $Revision: 2040 $
-# $HeadURL: https://subversion.xor.aps.anl.gov/bcdaioc/15iddUSX/15iddUSXApp/op/s15usaxs/scanLog/scanlog.xsl $
-# $Id: scanlog.xsl 2040 2009-02-22 21:30:17Z jemian $
-########### SVN repository information ###################
--->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
   <xsl:output method="html" omit-xml-declaration="yes" indent="yes" />
@@ -47,7 +38,7 @@
       <td><xsl:value-of select="@number" /></td>
       <td><xsl:value-of select="file" /></td>
       <td>
-        <xsl:value-of select="started/@date" /> 
+        <xsl:value-of select="started/@date" />
         <xsl:text> </xsl:text>
         <xsl:value-of select="started/@time" />
       </td>
@@ -57,7 +48,7 @@
         </xsl:when>
 	<xsl:otherwise>
 	  <td>
-        <xsl:value-of select="ended/@date" /> 
+        <xsl:value-of select="ended/@date" />
         <xsl:text> </xsl:text>
         <xsl:value-of select="ended/@time" />
       </td>

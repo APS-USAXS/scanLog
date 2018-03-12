@@ -19,12 +19,3 @@ def printReport(title, message = '', use_separators=True):
 def errorReport(message):
     '''report an error to stdout'''
     printReport("Python error report", message=message)
-
-
-########### SVN repository information ###################
-# $Date$
-# $Author$
-# $Revision$
-# $HeadURL$
-# $Id$
-########### SVN repository information ###################

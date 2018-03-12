@@ -10,13 +10,3 @@
   <EPICS_PV pv="9idcLAX:USAXS:specScan" tag="number">SPEC scan number</EPICS_PV>
   <EPICS_PV pv="9idcLAX:USAXS:sampleTitle" tag="title">SPEC sample title</EPICS_PV>
 </PV_LIST>
-
-<!-- 
-########### SVN repository information ###################
-# $Date$
-# $Author$
-# $Revision$
-# $HeadURL$
-# $Id$
-########### SVN repository information ###################
--->

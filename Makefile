@@ -1,11 +1,4 @@
-
-########### SVN repository information ###################
-# $Date$
-# $Author$
-# $Revision$
-# $HeadURL$
-# $Id$
-########### SVN repository information ###################
+# scanLog/Makefile
 
 DATE_STRING = $(shell date '+%Y%m%d-%H%M%S')
 

@@ -45,7 +45,7 @@ def startScanEntry(scanLogFile, number, data_file_name, title, macro):
     if not macro in MACROS_ALLOWED_TO_LOG:
         return  # ignore this one
     scanID = buildID(number, data_file_name)
-    
+
     event = {
              'number': number,
              'phase': 'start',
@@ -83,12 +83,12 @@ def endScanEntry(scanLogFile, number, data_file_name):
 def event_processing(fifo, q_id, callback_function=None):
     '''
     process the event queue and add to XML file
-    
+
     This processing is handled in a separate thread.
     The thread is managed by the EventQueue() class.
     Processing can take some time, especially when appending to
     a large XML file.
-    
+
     :param [event] fifo: list of events (the queue)
     :param obj callback_function: method to call at the end of this method
 
@@ -126,21 +126,21 @@ def event_processing(fifo, q_id, callback_function=None):
             if scanNode is not None:
                 errorReport(q_id + ": One or more scans matches in the log file.")
                 continue
-         
+
             root = doc.getroot()
             scanNode = ElementTree.Element('scan')
             scanNode.set('number', event['number'])
             scanNode.set('state', 'scanning')
             scanNode.set('id', event['scanID'])
             scanNode.set('type', event['macro'])
-         
+
             # put this scan at the end of the list
             root.append(scanNode)
-         
+
             xmlSupport.appendTextNode(doc, scanNode, 'title', event['title'])
             xmlSupport.appendTextNode(doc, scanNode, 'file', event['data_file_name'])
             xmlSupport.appendDateTimeNode(doc, scanNode, 'started', event['datetime_full'])
-         
+
             xmlSupport.flagRunawayScansAsUnknown(doc, scanID)
 
         elif event['phase'] == 'end':
@@ -148,6 +148,7 @@ def event_processing(fifo, q_id, callback_function=None):
             scanNode = xmlSupport.locateScanID(doc, scanID)
             if scanNode is None:
                 errorReport(q_id + ": Could not find scan in the log file: " + str(scanID))
+                # TODO: could mark the scan end received with no matching start
                 continue
             if (scanNode.get('state') == 'scanning'):
                 scanNode.set('state', 'complete')   # set scan/@state="complete"
@@ -165,7 +166,7 @@ def event_processing(fifo, q_id, callback_function=None):
         printReport(q_id + ': XML file written', use_separators=False)
     except Exception as exc:
         printReport(q_id + ': Exception while writing XML', str(exc))
-        
+
     try:
         printReport(q_id + ': transfer to WWW server started', use_separators=False)
 
@@ -219,21 +220,21 @@ class EventQueue(object):
         self.fifo = []      # the event queue
         self.processing = False
         self.q_id = 0
-    
+
     def add_event(self, *event):
         '''
         add an instrument scan event to the queue (actually a FIFO)
-        
+
         Run the processing step.  If processing is already running,
         the callback will catch up with the new queue entries eventually.
         '''
         self.fifo.append(*event)
         self.process_queue()
-    
+
     def callback(self, q_id):
         '''
         check the queue and process any remaining events
-        
+
         Since the processing can take some time, it is done in a separate thread.
         During that time, additional events might be queued.
         Ultimately, this callback from the end of the processing method,
@@ -249,7 +250,7 @@ class EventQueue(object):
     def process_queue(self):
         '''
         prepare to process events and append them to the XML file
-        
+
         Since the processing can take some time, it is done in a separate thread.
         '''
         if len(self.fifo) == 0 or self.processing:
@@ -260,7 +261,7 @@ class EventQueue(object):
         work_queue = list(self.fifo)
 
         self.fifo = self.fifo[len(work_queue):]
-        thread = threading.Thread(target=event_processing, 
+        thread = threading.Thread(target=event_processing,
                                   args=(work_queue, qStr, self.callback))
         printReport(qStr + ": thread starting", thread.name, use_separators=False)
         thread.start()
@@ -278,8 +279,8 @@ if __name__ == "__main__":
         sys.exit()
 
     scriptname, mode, number, datafile, title, macro = sys.argv
-    
-    # This main() is test code.  The standard support starts with pvSupport.py 
+
+    # This main() is test code.  The standard support starts with pvSupport.py
 
     if (mode == 'started'):
         startScanEntry(xmlFile, number, datafile, title, macro)
@@ -288,12 +289,3 @@ if __name__ == "__main__":
     else:
         usage()
         sys.exit()
-
-
-########### SVN repository information ###################
-# $Date$
-# $Author$
-# $Revision$
-# $HeadURL$
-# $Id$
-########### SVN repository information ###################

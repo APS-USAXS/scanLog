@@ -22,7 +22,7 @@ from reporting import errorReport, printReport
 def setupEpicsConnection(pvEntry):
     '''
     prepare data structures to monitor this EPICS PV and initiate the monitor
-    
+
     :param str pvEntry: EPICS PV name string
     :return obj: instance of epics.PV(): EPICS PV channel object
     '''
@@ -48,8 +48,8 @@ def doEpicsPvMonitorEvent(pvname=None, char_value=None, **kw):
 
 def connectPvAndMonitor(pv):
     '''connect with EPICS PV and initiate monitor'''
-    ch = epics.PV(pv, 
-                  connection_callback=doEpicsPvConnectEvent, 
+    ch = epics.PV(pv,
+                  connection_callback=doEpicsPvConnectEvent,
                   callback=doEpicsPvMonitorEvent)
     return ch
 
@@ -154,12 +154,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-########### SVN repository information ###################
-# $Date$
-# $Author$
-# $Revision$
-# $HeadURL$
-# $Id$
-########### SVN repository information ###################

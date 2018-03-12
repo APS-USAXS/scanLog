@@ -28,9 +28,9 @@ setenv DATE "/bin/date --rfc-3339='seconds'"
 setenv SNAME $0
 setenv SELECTION $1
 
-#/bin/echo "#${SNAME} ${SELECTION}>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"  >>& ${LOGFILE} 
-/bin/echo "# `${DATE}` ${SNAME} ${SELECTION}"  >>& ${LOGFILE} 
-#/bin/echo "# env: `env|sort`"  >>& ${LOGFILE} 
+#/bin/echo "#${SNAME} ${SELECTION}>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"  >>& ${LOGFILE}
+/bin/echo "# `${DATE}` ${SNAME} ${SELECTION}"  >>& ${LOGFILE}
+#/bin/echo "# env: `env|sort`"  >>& ${LOGFILE}
 
 switch (${SELECTION})
   case "start":
@@ -76,14 +76,5 @@ switch (${SELECTION})
 
 endsw
 
-#/bin/echo "#${SNAME} ${SELECTION}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"  >>& ${LOGFILE} 
+#/bin/echo "#${SNAME} ${SELECTION}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"  >>& ${LOGFILE}
 
-
-
-########### SVN repository information ###################
-# $Date$
-# $Author$
-# $Revision$
-# $HeadURL$
-# $Id$
-########### SVN repository information ###################
