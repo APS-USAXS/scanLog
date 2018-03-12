@@ -9,7 +9,7 @@ and search for USAXS scans (uascan and sbuascan).
 Note information about those found and report back in
 XML format.
 
-.. note:: 
+.. note::
    This routine would be improved immensely by using standard
    XML library support instead of writing strings in XML statements.
    The standard library support would avert problems such as
@@ -170,12 +170,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-########### SVN repository information ###################
-# $Date$
-# $Author$
-# $Revision$
-# $HeadURL$
-# $Id$
-########### SVN repository information ###################
