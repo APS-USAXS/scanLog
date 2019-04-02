@@ -26,11 +26,12 @@ def setupEpicsConnection(pvEntry):
     :param str pvEntry: EPICS PV name string
     :return obj: instance of epics.PV(): EPICS PV channel object
     '''
-    global db
+    global db, as_string
     pv = pvEntry['pv']
     db[pv + ',count'] = 0
     ch = connectPvAndMonitor(pv)
     db[pv] = ch
+    as_string[pv] = pvEntry.get("string", "false").lower() in ("t", "true")
     return ch
 
 
@@ -61,12 +62,16 @@ def timeToStr(time_seconds):
 
 def reportEpicsPvs(pvList):
     '''print all the PV values to stdout'''
-    global db
+    global db, as_string
     t = pyRestTable.Table()
     t.labels = ["time stamp", "# received", "PV name", "value"]
     for pv in sorted(pvList):
         timeStr = timeToStr(db[pv].timestamp)
-        t.rows.append( (timeStr, db[pv+',count'], pv, db[pv].value) )
+        if as_string[pv]:
+            value = db[pv].char_value
+        else:
+            value = db[pv].value
+        t.rows.append( (timeStr, db[pv+',count'], pv, value) )
     print "#" + ">"*60
     print "# reportEpicsPvs(): " + timeToStr(time.time())
     print t.reST(),
@@ -80,12 +85,12 @@ def updateScanLog(lastScanningState):
     global pvTag
     scanningState = db[pvTag['scanning']].value
     if scanningState != lastScanningState and lastScanningState != 'initial':
-        directory = db[pvTag['directory']].value
-        fileName = db[pvTag['file']].value
+        directory = db[pvTag['directory']].char_value
+        fileName = db[pvTag['file']].char_value
         datafile = os.path.join(directory, fileName)
-        title = db[pvTag['title']].value
+        title = db[pvTag['title']].char_value
         number = str(db[pvTag['number']].value)
-        scanmacro = db[pvTag['scanmacro']].value
+        scanmacro = db[pvTag['scanmacro']].char_value
         if str(scanningState) in ( 'scanning', '1', 1 ):
             updates.startScanEntry(
                 cfg['scanLog'], number, datafile, title, scanmacro)
@@ -104,6 +109,7 @@ PVLIST_XML = 'pvlist.xml'
 
 def main():
     ''' monitor the EPICS PVs for the scan and update the XML file'''
+    global as_string
     global cfg
     global db
     global pvTag
@@ -117,6 +123,7 @@ def main():
     printReport("scanLog startup", message, use_separators=False)
     sys.stdout.flush()
 
+    as_string = {}
     db = {}
     pvList = []
     pvTag = {}
@@ -138,7 +145,7 @@ def main():
     nextReport = time.time()        # make first reportEpicsPvs right away
 
     printReport("starting main event loop", use_separators=False)
-    while 1:
+    while True:
         epics.ca.poll() # receives all PV monitors, not just for ch
         try:
             lastScanningState = updateScanLog(lastScanningState)
