@@ -37,8 +37,9 @@ def setupEpicsConnection(pvEntry):
 
 def doEpicsPvConnectEvent(**kw):
     '''responds to an EPICS connect event on a process variable (PV)'''
-    conn = kw['conn']
+    # conn = kw['conn']
     # otherwise, do nothing
+    pass
 
 
 def doEpicsPvMonitorEvent(pvname=None, char_value=None, **kw):

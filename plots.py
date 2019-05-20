@@ -4,7 +4,6 @@
 
 
 import datetime
-import glob
 import os
 import spec2nexus.spec
 import xmlSupport
@@ -154,7 +153,6 @@ class Scan(object):
             if self.spec_scan is None:
                 self.spec_scan = self.getSpecScan()
             # TODO: reduce
-            pass
         elif self.scan_type in ('pinSAXS', 'SAXS'):
             pass
         elif self.scan_type in ('WAXS'):
@@ -208,12 +206,11 @@ def plottable_scan(scan_node):
                 if line.find('FlyScan file name = ') > 1:
                     hdf5_file = line.split('=')[-1].strip().rstrip('.')
                     hdf5_file = os.path.abspath(os.path.join(specfiledir, hdf5_file))
-                    if os.path.exists(hdf5_file):
+                    if hdf5_file is None or not os.path.exists(hdf5_file):
+                        scan = None     # bail out, no HDF5 file found
+                    else:
                         # actual data file
                         scan_node.data_file = hdf5_file
-                        ok = True
-                    else:
-                        scan = None     # bail out, no HDF5 file found
                     break
 
     if scan is not None:
