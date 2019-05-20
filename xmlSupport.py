@@ -45,7 +45,7 @@ def openScanLogFile(xmlFile):
     doc = None
     try:
         doc = ElementTree.parse(xmlFile)
-    except:
+    except Exception:
         pass
     return doc
 
@@ -88,7 +88,7 @@ def readFileAsLines(filename):
         buf = f.read()
         f.close()
         return buf.split("\n")
-    except:
+    except Exception:
         return None
 
 #**************************************************************************
@@ -99,7 +99,7 @@ def writeLinesInFile(filename, lines):
         f = open(filename, 'w')
         f.write("\n".join(lines) + "\n")
         f.close()
-    except:
+    except Exception:
         pass
 
 #**************************************************************************
