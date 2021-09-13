@@ -6,7 +6,7 @@
   <EPICS_PV pv="9idcLAX:USAXS:scanning" tag="scanning">USAXS scanning?</EPICS_PV>
   <EPICS_PV pv="9idcLAX:USAXS:userDir" tag="directory" string="true">SPEC data directory</EPICS_PV>
   <EPICS_PV pv="9idcLAX:USAXS:scanMacro" tag="scanmacro">name of spec USAXS scan macro (uascan | sbuascan)</EPICS_PV>
-  <EPICS_PV pv="9idcLAX:USAXS:specFile" tag="file">SPEC data file</EPICS_PV>
+  <EPICS_PV pv="9idcLAX:USAXS:specFile" tag="file" string="true">SPEC data file</EPICS_PV>
   <EPICS_PV pv="9idcLAX:USAXS:specScan" tag="number">SPEC scan number</EPICS_PV>
   <EPICS_PV pv="9idcLAX:USAXS:sampleTitle" tag="title" string="true">SPEC sample title</EPICS_PV>
 </PV_LIST>
